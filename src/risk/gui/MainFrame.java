@@ -122,7 +122,7 @@ public class MainFrame extends JFrame{
 				readFileController.readFile(selectedFile.getAbsolutePath());
 			}
 			else {
-				throw new Exception();
+				throw new Exception("You did not select a map file.");
 			}
 			
 		}

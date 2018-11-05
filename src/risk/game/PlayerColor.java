@@ -7,12 +7,13 @@ public class PlayerColor {
 	private static final int size = 6;
 	private static int index = 0;
 	
-	private static Color[] colors = new Color[] {Color.red,
+	private static Color[] colors = new Color[] {	Color.red,
 													Color.blue,
-													Color.yellow,
 													Color.green,
+													Color.orange,
 													Color.pink,
-													Color.cyan};
+													Color.lightGray
+												};
 	
 	public static Color nextColor() {
 		if (index >= size) {

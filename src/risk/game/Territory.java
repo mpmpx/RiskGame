@@ -2,6 +2,7 @@ package risk.game;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.LinkedList;
 
 public class Territory {
 
@@ -10,6 +11,7 @@ public class Territory {
 	private Point location;
 	private Color owner;
 	private int army;
+	private LinkedList<Point> shape;
 	
 	public Territory() {
 		name = null;
@@ -84,5 +86,17 @@ public class Territory {
 	
 	public void removeArmy(int army) {
 		this.army -= army;
+	}
+	
+	public void setShape(LinkedList<Point> shape) {
+		this.shape = shape;
+	}
+	
+	public LinkedList<Point> getShape() {
+		return shape;
+	}
+	
+	public boolean contains(Point location) {
+		return shape.contains(location);
 	}
 }

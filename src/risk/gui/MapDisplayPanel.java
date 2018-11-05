@@ -4,23 +4,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Random;
-import java.util.Stack;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -35,6 +27,8 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	private int currentPhase;
 	private RiskMap map;
 	private Territory selectedTerritory;
+	private Territory attackerTerritory;
+	private Territory defenderTerritory;
 	private BufferedImage image;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<Point, Territory> locationMap;
@@ -57,13 +51,8 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			locationMap.put(territory.getLocation(), territory);
 		}
 		
-		try {
-			image = ImageIO.read(new File(map.getImagePath()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		this.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+		image = map.getImage();
+		setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 		
 		paintImage();
 		repaint();
@@ -75,43 +64,42 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	public void update(Observable obs, Object arg) {
 		currentPhase = ((Phase) obs).getCurrentPhase();
 		currentPlayer = ((Phase) obs).getCurrentPlayer();
-
+		
 		if (currentPhase == Phase.FORTIFICATION) {
 			reachableMap = ((Phase) obs).getCurrentPlayer().getReachableMap();
 		}
+		
+		if (currentPhase != Phase.FORTIFICATION) {
+			if (selectedTerritory != null) {
+				selectedTerritory = null;
+				paintImage();
+			}
+		}
+		
+		if (currentPhase == Phase.ATTACK) {
+			attackableMap = ((Phase) obs).getCurrentPlayer().getAttackableMap();
+			attackerTerritory = ((Phase) obs).getAttacker();
+			defenderTerritory = ((Phase) obs).getDefender();
+			
+			if (attackerTerritory == null && defenderTerritory == null) {
+				paintImage();
+			}
+		} 
 		repaint();
 	}
 	
 	private void paintImage() {
-		try {
-			image = ImageIO.read(new File(map.getImagePath()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		image = map.getImage();
 		for (Territory territory : territoryMap.values()) {
-			paintTerritory(territory.getX(), territory.getY(), territory.getOwner());
+			paintTerritory(territory, territory.getOwner());
 		}
 	}
 	
 	
-	private void paintTerritory(int x, int y, Color color) {
-		Stack<Point> stack = new Stack<Point>();
-		int originColor = image.getRGB(x, y);
-		
-		stack.push(new Point(x, y));
-		while (!stack.isEmpty()) {
-			Point currentPoint = stack.pop();
-			int pointColor = image.getRGB(currentPoint.x, currentPoint.y);
-			if (pointColor != Color.black.getRGB() && (pointColor == originColor || pointColor == Color.white.getRGB())) {
-			
-				image.setRGB(currentPoint.x, currentPoint.y, color.getRGB());
-				stack.push(new Point(currentPoint.x + 1, currentPoint.y));
-				stack.push(new Point(currentPoint.x - 1, currentPoint.y));
-				stack.push(new Point(currentPoint.x, currentPoint.y + 1));
-				stack.push(new Point(currentPoint.x, currentPoint.y - 1));
-			}
-		}		
+	private void paintTerritory(Territory territory, Color color) {
+		for (Point point : territory.getShape()) {
+			image.setRGB(point.x, point.y, color.getRGB());
+		}
 	}
 	
     protected void paintComponent(Graphics g) {
@@ -129,40 +117,13 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	}
 		
 	private Territory selectTerritory(int x, int y) {
-		Stack<Point> stack = new Stack<Point>();
-		stack.push(new Point(x, y));
-		LinkedList<Point> visited = new LinkedList<Point>();
-		
-		while (!stack.isEmpty()) {
-			Point currentLocation = stack.pop();
-			
-			if (currentLocation.getX() > image.getWidth() - 1 || 
-					currentLocation.getX() < 0 ||
-					currentLocation.getY() > image.getHeight() - 1 ||
-					currentLocation.getY() < 0) {
-				return null;
-			}
-			
-			if (visited.contains(currentLocation) ){
-				continue;
-			}
-			else {
-				visited.add(currentLocation);
-			}
-			
-			if (image.getRGB(currentLocation.x, currentLocation.y) != Color.black.getRGB()) {		
-				if (locationMap.containsKey(currentLocation)) {
-					return locationMap.get(currentLocation);
-				}
-				
-				stack.push(new Point(currentLocation.x + 1, currentLocation.y));
-				stack.push(new Point(currentLocation.x - 1, currentLocation.y));
-				stack.push(new Point(currentLocation.x, currentLocation.y + 1));
-				stack.push(new Point(currentLocation.x, currentLocation.y - 1));
+		for (Territory territory : RiskMap.getInstance().getTerritoryMap().values()) {
+			if (territory.contains(new Point(x, y))) {
+				return territory;
 			}
 		}
 		
-		return null;	
+		return null;
 	}
 	
 	private class Listener implements MouseListener {
@@ -194,10 +155,10 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		private void startupClick(Territory territory) {
 			if (territory != null && currentPlayer.getTerritoryMap().containsValue(territory)) {
 				
-				SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, currentPlayer.getUnassignedArmy(), 1);;
+				SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, currentPlayer.getUnassignedArmy(), 1);
 				JSpinner spinner = new JSpinner(spinnerModel);
 				Object[] message = {
-						"Set armies (0 - " + currentPlayer.getUnassignedArmy() + ")", 
+						"Set armies to " + territory.getName() + "(0 - " + currentPlayer.getUnassignedArmy() + ")", 
 						spinner
 				};
 				
@@ -217,7 +178,50 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		}
 		
 		private void attackClick(Territory territory) {
-
+			if (territory != null) {
+				// select attacker territory
+				if (attackerTerritory == null) {	
+					if (currentPlayer.getTerritoryMap().containsValue(territory)) {
+						
+						// Territory with only one army or without adjacent enemy's territory is not able to be selected.
+						if (territory.getArmy() == 1 || attackableMap.get(territory.getName()).isEmpty()) {
+							return;
+						} 
+					
+						attackerTerritory = territory;
+						paintTerritory(territory, territory.getOwner().darker());
+						repaint();
+					}
+				}
+				// Select defender territory
+				else if (defenderTerritory == null) {
+					// Click on an territory which cannot be attacked by attacker territory.
+					if (!attackableMap.get(attackerTerritory.getName()).contains(territory)) {
+						attackerTerritory = null;
+						paintImage();
+						repaint();
+					}
+					// Set defender territory
+					else {
+						defenderTerritory = territory;
+						paintTerritory(territory, territory.getOwner().darker());
+						repaint();
+					}
+				}
+			}
+			else {
+				if (defenderTerritory != null) { 
+					return;
+				}
+				
+			  	if (attackerTerritory != null) {
+					attackerTerritory = null;
+					paintImage();
+					repaint();
+				}
+			}
+			
+			GameController.getInstance().setAttack(attackerTerritory , defenderTerritory);
 		}
 		
 		private void fortificationClick(Territory territory) {
@@ -232,7 +236,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 					}
 					
 					selectedTerritory = territory;
-					paintTerritory(territory.getX(), territory.getY(), territory.getOwner().darker());
+					paintTerritory(territory, territory.getOwner().darker());
 					repaint();
 				}
 				// Select arrival country.
@@ -248,17 +252,16 @@ public class MapDisplayPanel extends JPanel implements Observer{
 						SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, selectedTerritory.getArmy() - 1, 1);;
 						JSpinner spinner = new JSpinner(spinnerModel);
 						Object[] message = {
-								selectedTerritory.getName() + "(" + selectedTerritory.getArmy() + ") to "
+								selectedTerritory.getName() + "(" + selectedTerritory.getArmy() + ")  >>>>  "
 										+ territory.getName() + "(" + territory.getArmy() +")", 
+								"Move armies (1 - " + (selectedTerritory.getArmy() - 1) +")",
 								spinner
 						};
 						
 						int result = JOptionPane.showConfirmDialog(null, message, "Fortification", JOptionPane.OK_CANCEL_OPTION);
 						if (result == JOptionPane.OK_OPTION) {
 							GameController.getInstance().fortify(selectedTerritory, territory, (int) spinner.getValue());
-							paintTerritory(selectedTerritory.getX(), selectedTerritory.getY(), selectedTerritory.getOwner());
 							selectedTerritory = null;
-							repaint();
 						}
 					}
 					
@@ -275,19 +278,23 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		
 		
 		@Override
-		public void mouseEntered(MouseEvent arg0) {			
+		public void mouseEntered(MouseEvent arg0) {	
+			return;
 		}
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {			
+			return;
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {			
+			return;
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {			
+			return;
 		}
 		
 	}

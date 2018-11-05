@@ -1,7 +1,5 @@
 package risk.controller;
 
-import risk.gui.MainFrame;
-
 public class StartController {
 	
 	public static void main(String[] args) {
