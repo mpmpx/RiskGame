@@ -1,5 +1,6 @@
 package risk.game;
 
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -9,7 +10,7 @@ public class RiskMap {
 	public final static int MAX_ADJACENT_COUNTRIES = 10;
 	
 	private static RiskMap riskMap;
-	private String imagePath;
+	private BufferedImage image;
 	private HashMap<String, Continent> continentMap;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<String, LinkedList<String>> edgeMap;
@@ -25,25 +26,25 @@ public class RiskMap {
 	}
 	
 	private RiskMap() {
-		imagePath = null;
+		image = null;
 		continentMap = new HashMap<String, Continent>();
 		territoryMap = new HashMap<String, Territory>();
 		edgeMap = new HashMap<String, LinkedList<String>>();
 	}
 	
 	public void clear() {
-		imagePath = null;
+		image = null;
 		continentMap.clear();
 		territoryMap.clear();
 		edgeMap.clear();
 	}
 	
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
+	public void setImage(BufferedImage image) {
+		this.image = image;
 	}
 	
-	public String getImagePath() {
-		return imagePath;
+	public BufferedImage getImage() {
+		return image;
 	}
 	
 	public void addContinent(Continent newContinent) {

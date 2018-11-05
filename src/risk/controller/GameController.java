@@ -1,6 +1,7 @@
 package risk.controller;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 
 import risk.game.*;
@@ -10,7 +11,6 @@ public class GameController {
 	private static GameController controller;
 	
 	private Player[] players;
-	private Player currentPlayer;
 	private Phase phase;
 	private RiskMap map;
 	private HashMap<String, Territory> territoryMap;
@@ -24,7 +24,6 @@ public class GameController {
 	
 	private GameController() {
 		players = null;
-		currentPlayer = null;
 		phase = null;
 		map = null;
 		territoryMap = new HashMap<String, Territory>();
@@ -50,6 +49,8 @@ public class GameController {
 		phase.addPlayers(players);
 		phase.addObserver(GUIController.getInstance().getPhaseView());
 		phase.addObserver(GUIController.getInstance().getMapDisplayPanel());
+		phase.addObserver(GUIController.getInstance().getCardExchangeView());
+		phase.addObserver(GUIController.getInstance().getDominationView());
 		phase.initialize();	
 	}
 	
@@ -82,10 +83,6 @@ public class GameController {
 
 	}
 	
-	public Player getCurrentPlayer() {
-		return currentPlayer;
-	}
-	
 	public void nextPhase() {
 		phase.nextPhase();
 	}
@@ -98,4 +95,26 @@ public class GameController {
 		phase.addArmy(territory.getName(), army);
 	}
 	
+	public void setAttack(Territory attacker, Territory defender) {
+		phase.setAttack(attacker, defender);
+	}
+	
+	public void setAttackResult(int attackerCasulties, int defenderCasulties) {
+		phase.setAttackResult(attackerCasulties, defenderCasulties);
+	}
+	
+	public void conquerTerritory(int army) {
+		phase.conquerTerritory(army);
+		if (phase.getCurrentPlayer().getTerritoryMap().values().size() == RiskMap.getInstance().getTerritoryMap().values().size()) {
+			GUIController.getInstance().win(phase.getCurrentPlayer());
+		}
+	}
+	
+	public boolean checkAttackPhase() {
+		return phase.checkAttackPhase();	
+	}	
+	
+	public void exchangeCards(LinkedList<Integer> cards) {
+		phase.exchangeCards(cards);
+	}
 }

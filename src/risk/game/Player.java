@@ -1,6 +1,7 @@
 package risk.game;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -9,6 +10,8 @@ public class Player{
 
 	private String name;
 	private Color color;
+	private Cards cards;
+	
 	private HashMap<String, Territory> territoryMap;
 	private LinkedList<Continent> controlledContinent;
 	private HashMap<String, LinkedList<Territory>> reachableMap;
@@ -18,16 +21,21 @@ public class Player{
 	private int unassignedArmy;
 	private int freeArmy;
 	
+	private boolean hasConquered;
+	
 	public Player(String name) {
 		this.name = name;
 		color = PlayerColor.nextColor();
+		cards = new Cards();
 		territoryMap = new HashMap<String, Territory>();
 		controlledContinent = new LinkedList<Continent>();
 		reachableMap = new HashMap<String, LinkedList<Territory>>();
+		attackableMap = new HashMap<String, LinkedList<Territory>>();
 		ownedTerritoryNum = 0;
 		totalArmy = 0;
 		unassignedArmy = 0;
 		freeArmy = 0;
+		hasConquered = false;
 	}
 	
 	public void reinforcement() {
@@ -35,6 +43,10 @@ public class Player{
 	}
 	
 	public void attack() {
+		attackableMap.clear();
+		for (Territory territory : territoryMap.values()) {
+			attackableMap.put(territory.getName(), getAttackableList(territory));
+		}
 	}
 	
 	public void fortification() {
@@ -44,28 +56,52 @@ public class Player{
 		}
 	}
 	
-	private void getReinforcement() {
+	private void updateControlledContinent() {
 		LinkedList<String> territoryList = new LinkedList<String>();
-		LinkedList<Continent> continentList = new LinkedList<Continent>(RiskMap.getInstance().getContinentMap().values());
-
-		unassignedArmy = 0;
-		freeArmy = 0;
+		controlledContinent.clear();
 		
 		for (Territory territory : territoryMap.values()) {
 			territoryList.add(territory.getName());
 		}
 		
-		freeArmy = (int) Math.max(Math.floor(ownedTerritoryNum / 3), 3);
-		unassignedArmy  += freeArmy;
-		controlledContinent.clear();
-		for (Continent continent : continentList) {
+		for (Continent continent : RiskMap.getInstance().getContinentMap().values()) {
 			if (continent.isOwned(territoryList)) {
-				unassignedArmy += continent.getValue();
 				controlledContinent.add(continent);
 			}
 		}
+	}
+	
+	private void getReinforcement() {
+		unassignedArmy = 0;
+		freeArmy = 0;
 
+		freeArmy = (int) Math.max(Math.floor(ownedTerritoryNum / 3), 3);
+		unassignedArmy  += freeArmy;
+		
+		for (Continent continent : controlledContinent) {
+			unassignedArmy += continent.getValue();
+		}
+		
 		totalArmy += unassignedArmy;
+	}
+	
+	public HashMap<String, LinkedList<Territory>> getAttackableMap() {
+		return attackableMap;
+	}
+	
+	private LinkedList<Territory> getAttackableList(Territory territory) {
+		LinkedList<Territory> attackableList = new LinkedList<Territory>();
+		HashMap<String, LinkedList<String>> edgeMap = RiskMap.getInstance().getEdgeMap();
+		
+		if (territory.getArmy() > 1)
+		for (String adjacent : edgeMap.get(territory.getName())) {
+			Territory adjacentTerritory = RiskMap.getInstance().getTerritoryMap().get(adjacent);
+			if (!territoryMap.containsKey(adjacentTerritory.getName())) {
+				attackableList.add(RiskMap.getInstance().getTerritoryMap().get(adjacent));
+			}
+		}
+		
+		return attackableList;
 	}
 	
 	public HashMap<String, LinkedList<Territory>> getReachableMap() {
@@ -104,10 +140,11 @@ public class Player{
 		totalArmy += army;
 		for (Territory territory : territoryMap.values()) {
 			territory.addArmy(1);
+			totalArmy++;
 			RiskMap.getInstance().updateTerritory(territory);
 		}
 		
-		unassignedArmy -= ownedTerritoryNum;
+		//unassignedArmy -= ownedTerritoryNum;
 	}
 	
 	public String getName() {
@@ -121,6 +158,24 @@ public class Player{
 	public void addTerritory(Territory territory) {
 		territoryMap.put(territory.getName(), territory);
 		ownedTerritoryNum++;
+		updateControlledContinent();
+	}
+	
+	public void removeTerritory(Territory territory) {
+		totalArmy -= territory.getArmy();
+		territoryMap.remove(territory.getName());
+		ownedTerritoryNum--;
+		updateControlledContinent();
+	}
+	
+	public Territory findTerritory(int x, int y) {
+		for (Territory territory : territoryMap.values()) {
+			if (territory.getShape().contains(new Point(x, y))) {
+				return territory;
+			}
+			
+		}
+		return null;
 	}
 	
 	public HashMap<String, Territory> getTerritoryMap() {
@@ -154,9 +209,32 @@ public class Player{
 		RiskMap.getInstance().updateTerritory(territoryMap.get(territory));
 	}
 	
-
+	public void killArmy(String territory, int army) {
+		removeArmy(territory, army);
+		totalArmy -= army;
+	}
 	
-
+	public boolean hasConquered() {
+		return hasConquered;
+	}
 	
-
+	public void conquer() {
+		hasConquered = true;
+	}
+	
+	public void getCard() {
+		if (hasConquered) {
+			cards.getCard();
+			hasConquered = false;
+		}
+	}
+	
+	public Cards getCardSet() {
+		return cards;
+	}
+	
+	public void addExchangeBonusArmy(int army) {
+		totalArmy += army;
+		unassignedArmy += army;
+	}
 }

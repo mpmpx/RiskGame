@@ -1,5 +1,8 @@
 package risk.controller;
 
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,6 +12,8 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.stream.Stream;
 
+import javax.imageio.ImageIO;
+
 import risk.game.*;
 
 public class ReadFileController {
@@ -16,6 +21,7 @@ public class ReadFileController {
 	private HashMap<String, Continent> continentMap;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<String, LinkedList<String>> edgeMap;
+	private BufferedImage image;
 	private String label;
 	
 	private boolean bMap, bContinent, bTerritory;
@@ -24,6 +30,7 @@ public class ReadFileController {
 		continentMap = new HashMap<String, Continent>();
 		territoryMap = new HashMap<String, Territory>();
 		edgeMap = new HashMap<String, LinkedList<String>>();
+		image = null;
 		
 		bMap = false;
 		bContinent = false;
@@ -131,6 +138,45 @@ public class ReadFileController {
     	}
     }
     
+    private LinkedList<Point> getTerritoryShape(Territory territory) {
+    	LinkedList<Point> shape = new LinkedList<Point>();
+    	Point location = territory.getLocation();
+    	Stack<Point> stack = new Stack<Point>();
+    	HashMap<Point, Boolean> visited = new HashMap<Point, Boolean>();
+    	    	
+    	int originColor = image.getRGB(location.x, location.y);
+    	
+    	stack.push(location);
+    	
+    	while (!stack.isEmpty()) {
+    		Point currentLocation = stack.pop();
+ 
+    		
+    		if (image.getRGB(currentLocation.x, currentLocation.y) == originColor) {
+    			if (currentLocation.x > 0 && currentLocation.x < image.getWidth()) {
+    				if (currentLocation.y > 0 && currentLocation.y < image.getHeight()) {
+    					if (visited.get(currentLocation) == null || visited.get(currentLocation) != true) {
+    						shape.add(currentLocation);
+    						visited.put(currentLocation, true);
+    						//System.out.println(currentLocation.x + " " + currentLocation.y);
+    					
+    					
+    		    			stack.push(new Point(currentLocation.x + 1, currentLocation.y));
+    		    			stack.push(new Point(currentLocation.x - 1, currentLocation.y));
+    		    			stack.push(new Point(currentLocation.x, currentLocation.y + 1));
+    		    			stack.push(new Point(currentLocation.x, currentLocation.y - 1)); 
+    					}
+    				}
+    			}
+    		}
+    		
+
+    	}
+    	
+    	return shape;
+    }
+    
+    
     /**
      * Method to read a .map file and store all information to an instance of RiskMap and check
      * correctness of every information.
@@ -157,7 +203,18 @@ public class ReadFileController {
                     case "[Map]": {
                     	String[] token = line.split("=");
                     	if (token[0].equals("image")) {
-                    		map.setImagePath(new File(file.getParent(), token[1]).getPath());
+                    		try {
+								image = ImageIO.read(new File(new File(file.getParent(), token[1]).getPath()));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+                    		
+                    		// Change the color model of the image to accommodate all colors.
+                    	    BufferedImage newImage= new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    	    Graphics2D g2d= newImage.createGraphics();
+                    	    g2d.drawImage(image, 0, 0, null);
+                    	    g2d.dispose();
+                    		map.setImage(newImage);
                     	}
                     	
                     	bMap = true;
@@ -181,6 +238,7 @@ public class ReadFileController {
                         territory.setLocation(Integer.parseInt(token[1]), Integer.parseInt(token[2]));        
                         territory.setContinentName(token[3]);
                         territoryMap.put(territory.getName(), territory);    
+                        territory.setShape(getTerritoryShape(territory));
                         
                         edgeMap.put(territory.getName(), new LinkedList<String>());                          
                         for (int i = 4; i < token.length; i++) {
