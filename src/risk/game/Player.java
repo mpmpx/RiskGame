@@ -87,7 +87,9 @@ public class Player{
 			}
 		}
 	}
-	
+	/**
+	 * Private method to reinforce
+	 */
 	private void getReinforcement() {
 		unassignedArmy = 0;
 		freeArmy = 0;
@@ -101,11 +103,20 @@ public class Player{
 		
 		totalArmy += unassignedArmy;
 	}
-	
+	/**
+	 * Method to get a list of terrortories that are attackable
+	 * @return attackableMap
+	 */
 	public HashMap<String, LinkedList<Territory>> getAttackableMap() {
 		return attackableMap;
 	}
-	
+	/**
+	 * This class will take in a territory as well as the territory it is going to
+	 * attack. It will return the list of the object of the territory it wants to attack if
+	 * the player is allowed to attack that country
+	 * @ param territory
+	 * @ return attackableList
+	 */
 	private LinkedList<Territory> getAttackableList(Territory territory) {
 		LinkedList<Territory> attackableList = new LinkedList<Territory>();
 		HashMap<String, LinkedList<String>> edgeMap = RiskMap.getInstance().getEdgeMap();
@@ -120,11 +131,19 @@ public class Player{
 		
 		return attackableList;
 	}
-	
+	/**
+	 * Method to get a hashmap of terrortories that is reachable
+	 * @return reachableMap
+	 */
 	public HashMap<String, LinkedList<Territory>> getReachableMap() {
 		return reachableMap;
 	}
-	
+	/**
+	 * This class will take in a territory as well as the territory it is going to
+	 * reach . It will return the list of the object of the territory which is reachable
+	 * @ param territory
+	 * @ return reachableList
+	 */
 	private LinkedList<Territory> getReachableList(Territory territory) {
 		LinkedList<Territory> reachableList = new LinkedList<Territory>();
 		Stack<Territory> stack = new Stack<Territory>();
@@ -151,7 +170,11 @@ public class Player{
 		
 		return reachableList;
 	}
-	
+	/**
+	 * Method to set unsigned army, after signed, the total army will increase
+	 * 
+	 * @param the number of army
+	 */
 	public void setUnsignedArmy(int army) {
 		unassignedArmy = army;
 		totalArmy += army;
@@ -163,7 +186,11 @@ public class Player{
 		
 		//unassignedArmy -= ownedTerritoryNum;
 	}
-	
+	/**
+	 * To get the player's name
+	 * 
+	 * @return the player name with String type
+	 */
 	public String getName() {
 		return name;
 	}
@@ -198,7 +225,12 @@ public class Player{
 		ownedTerritoryNum--;
 		updateControlledContinent();
 	}
-	
+	/**
+	 * To find a territory using coordinator x and y
+	 * 
+	 * @param x, y
+	 *            the coodinator of the point to indicate a territory
+	 */
 	public Territory findTerritory(int x, int y) {
 		for (Territory territory : territoryMap.values()) {
 			if (territory.getShape().contains(new Point(x, y))) {
@@ -208,62 +240,120 @@ public class Player{
 		}
 		return null;
 	}
-	
+	/**
+	 * To get the territory' map
+	 * 
+	 * @return territoryMap in HashMap
+	 */
 	public HashMap<String, Territory> getTerritoryMap() {
 		return territoryMap;
 	}
-	
+	/**
+	 * To get the number of unassigned army
+	 * 
+	 * @return unassignedArmy with type int
+	 */
 	public int getUnassignedArmy() {
 		return unassignedArmy;
 	}
-	
+	/**
+	 * To get the number of total army
+	 * 
+	 * @return total with type int
+	 */
 	public int getTotalArmy() {
 		return totalArmy;
 	}
-	
+	/**
+	 * To get the initial army 
+	 * 
+	 * @return the number of the got free armies
+	 */
 	public int getFreeArmy() {
 		return freeArmy;
 	}
-	
+	/**
+	 * To get the controlled continent 
+	 * 
+	 * @return the controlledContinent with type linkedlist
+	 */
 	public LinkedList<Continent> getControlledContinent() {
 		return controlledContinent;
 	}
-	
+	/**
+	 * To add the number of army according to territory
+	 * 
+	 * @param territory
+	 *        
+	 * @param army
+	 *            
+	 */
 	public void addArmy(String territory, int army) {
 		territoryMap.get(territory).addArmy(army);
 		RiskMap.getInstance().updateTerritory(territoryMap.get(territory));
 		unassignedArmy -= army;
 	}
-	
+	/**
+	 * To remove the number of army according to territory
+	 * 
+	 * @param territory
+	 *        
+	 * @param army
+	 *            update the corrected version of territory after removed army
+	 */
 	public void removeArmy(String territory, int army) {
 		territoryMap.get(territory).removeArmy(army);
 		RiskMap.getInstance().updateTerritory(territoryMap.get(territory));
 	}
-	
+	/**
+	 * To get the number of killed army according to territory
+	 * 
+	 * @param territory
+	 *        
+	 * @param army
+	 *          removed the army, and the total army will decrease as well
+	 */
 	public void killArmy(String territory, int army) {
 		removeArmy(territory, army);
 		totalArmy -= army;
 	}
-	
+	/**
+	 * Method to check if the player lose the game
+	 * 
+	 * @return true if the player has conquered
+	 */
 	public boolean hasConquered() {
 		return hasConquered;
 	}
-	
+	/**
+	 * Method to check whether player conquered at least one country
+	 * 
+	 * @return true if the player has conquer
+	 */
 	public void conquer() {
 		hasConquered = true;
 	}
-	
+	/**
+	 * To give the player the hand cards
+	 */
 	public void getCard() {
 		if (hasConquered) {
 			cards.getCard();
 			hasConquered = false;
 		}
 	}
-	
+	/**
+	 * To get the player's hand cards list
+	 * 
+	 * @return cards
+	 */
 	public Cards getCardSet() {
 		return cards;
 	}
-	
+	/**
+	 * To get the initial army bonus in the setup phase
+	 * 
+	 */
 	public void addExchangeBonusArmy(int army) {
 		totalArmy += army;
 		unassignedArmy += army;
