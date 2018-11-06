@@ -4,10 +4,9 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedList;
 /**
- * 
- * The Map method handles its related functions
- *
+ * This class represents all of the data and funcionality that related to map
  */
+
 public class RiskMap {
 	public final static int MAX_CONTINENT = 32;
 	public final static int MAX_COUNTRY = 255;
