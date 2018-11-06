@@ -3,7 +3,12 @@ package risk.game;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedList;
-
+/**
+ * 
+ * The Map model. 
+ * function. 
+ *
+ */
 public class RiskMap {
 	public final static int MAX_CONTINENT = 32;
 	public final static int MAX_COUNTRY = 255;
@@ -31,7 +36,9 @@ public class RiskMap {
 		territoryMap = new HashMap<String, Territory>();
 		edgeMap = new HashMap<String, LinkedList<String>>();
 	}
-	
+	/**
+	 * Initial function of the class, normalize the local variables.
+	 */
 	public void clear() {
 		image = null;
 		continentMap.clear();
@@ -42,11 +49,20 @@ public class RiskMap {
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
-	
+	/**
+	 * Return the current Image.
+	 * 
+	 * @return The current Image.
+	 */
 	public BufferedImage getImage() {
 		return image;
 	}
-	
+	/**
+	 * Add a qualified continent to the local variables.
+	 * 
+	 * @param newContinent
+	 *            The input continent.
+	 */
 	public void addContinent(Continent newContinent) {
 		continentMap.put(newContinent.getName(), newContinent);
 	}
@@ -54,11 +70,21 @@ public class RiskMap {
 	public HashMap<String, Continent> getContinentMap() {
 		return continentMap;
 	}
-	
+	/**
+	 * Add a qualified territory to the local variables.
+	 * 
+	 * @param territory
+	 *            The input territory.
+	 * 
+	 */
 	public void addTerritory(Territory territory) {
 		territoryMap.put(territory.getName(), territory);
 	}
-	
+	/**
+	 * updating the territory information, and replace it with thhe new territory name.
+	 * 
+	 * @param territory
+	 */
 	public void updateTerritory(Territory territory) {
 		territoryMap.replace(territory.getName(), territory);
 	}
