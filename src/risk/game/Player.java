@@ -5,7 +5,11 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
-
+/**
+ * This class represents all of the data and funcionality that a player would
+ * have. All of the actions that a player would do eventually comes back to this
+ * class.
+ */
 public class Player{
 
 	private String name;
@@ -22,7 +26,12 @@ public class Player{
 	private int freeArmy;
 	
 	private boolean hasConquered;
-	
+	/**
+	 * Constructor method
+	 * 
+	 * @param name
+	 *            the player name with String type
+	 */
 	public Player(String name) {
 		this.name = name;
 		color = PlayerColor.nextColor();
@@ -37,25 +46,33 @@ public class Player{
 		freeArmy = 0;
 		hasConquered = false;
 	}
-	
+	/**
+	 * Method to reinforce by implementing the selected strategy
+	 */
 	public void reinforcement() {
 		getReinforcement();
 	}
-	
+	/**
+	 * Method to attack by implementing the selected strategy
+	 */
 	public void attack() {
 		attackableMap.clear();
 		for (Territory territory : territoryMap.values()) {
 			attackableMap.put(territory.getName(), getAttackableList(territory));
 		}
 	}
-	
+	/**
+	 * Method to fortify by implementing the selected strategy
+	 */
 	public void fortification() {
 		reachableMap.clear();
 		for (Territory territory : territoryMap.values()) {
 			reachableMap.put(territory.getName(), getReachableList(territory));
 		}
 	}
-	
+	/**
+	 * Method to update continent
+	 */
 	private void updateControlledContinent() {
 		LinkedList<String> territoryList = new LinkedList<String>();
 		controlledContinent.clear();
@@ -150,17 +167,31 @@ public class Player{
 	public String getName() {
 		return name;
 	}
-	
+	/**
+	 * To get the player's color
+	 * 
+	 * @return the player color with Color type
+	 */
 	public Color getColor() {
 		return color;
 	}
-	
+	/**
+	 * To add a territory to the player's territory list
+	 * 
+	 * @param territory
+	 *            a territory that need to be added with Country type
+	 */
 	public void addTerritory(Territory territory) {
 		territoryMap.put(territory.getName(), territory);
 		ownedTerritoryNum++;
 		updateControlledContinent();
 	}
-	
+	/**
+	 * To remove a territory from the player's territory list
+	 * 
+	 * @param territory
+	 *            a territory that need to be removed with territory type
+	 */
 	public void removeTerritory(Territory territory) {
 		totalArmy -= territory.getArmy();
 		territoryMap.remove(territory.getName());
