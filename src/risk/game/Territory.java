@@ -170,15 +170,28 @@ public class Territory {
 	public void removeArmy(int army) {
 		this.army -= army;
 	}
-	
+	/**
+	 * To set the Shape
+	 * 
+	 * @param shape
+	 *            set set with linkedlist type
+	 */
 	public void setShape(LinkedList<Point> shape) {
 		this.shape = shape;
 	}
-	
+	/**
+	 * To get Shape.
+	 * 
+	 * @return the shape .
+	 */
 	public LinkedList<Point> getShape() {
 		return shape;
 	}
-	
+	/**
+	 * To check if the location has shape
+	 * 
+	 * @return shape.contains(location)
+	 */
 	public boolean contains(Point location) {
 		return shape.contains(location);
 	}
