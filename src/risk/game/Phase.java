@@ -2,7 +2,9 @@ package risk.game;
 
 import java.util.LinkedList;
 import java.util.Observable;
-
+/**
+ * This class is showing the current phase of conquest game and current player
+ */
 public class Phase extends Observable {
 
 	public final static int STARTUP = -1;
@@ -18,7 +20,9 @@ public class Phase extends Observable {
 	
 	private Territory attacker;
 	private Territory defender;
-	
+	/**
+	 * Initialize the contents of the frame.
+	 */
 	public void initialize() {
 		playerIndex = 0;
 		exchangeBonusArmy = 5;
@@ -30,7 +34,9 @@ public class Phase extends Observable {
 		notifyObservers();
 	}
 
-	
+	/**
+	 * Method to get into next Phase of the game.
+	 */
 	public void nextPhase() {
 		
 		// During startup cycle.
@@ -67,42 +73,82 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+	/**
+	 * Method to add players.
+	 * 
+	 */
 	public void addPlayers(Player[] players) {
 		this.players = players;
 	}
-	
+	/**
+	 * Method to get current phase when players in the game
+	 * 
+	 * @return currentPhase
+	 */
 	public int getCurrentPhase() {
 		return currentPhase;
 	}
-	
+	/**
+	 * Method to get current players in the game
+	 * 
+	 * @return current player
+	 */
 	public Player getCurrentPlayer() {
 		return currentPlayer;
 	}
-	
+	/**
+	 * Method to get all players
+	 * 
+	 * @return players
+	 */
 	public Player[] getPlayers() {
 		return players;
 	}
-	
+	/**
+	 * To set attack
+	 * 
+	 * @param attacker
+	 *            indicate whether the player is an attacker during this game
+	 * @param defender
+	 *            indicate  whether the player is a defender during this game
+	 */
 	public void setAttack(Territory attacker, Territory defender) {
 		this.attacker = attacker;
 		this.defender = defender;
 		setChanged();
 		notifyObservers();
 	}
-	
+	/**
+	 * To set attacker
+	 * 
+	 * @param attacker
+	 *            indicate the player is an attacker during this game
+	 */
 	public void setAttacker(Territory attacker) {
 		this.attacker = attacker;
 	}
-	
+	/**
+	 * Method to get get attacker in this territory
+	 * 
+	 * @return attacker
+	 */
 	public Territory getAttacker() {
 		return attacker;
 	}
-	
+	/**
+	 * To set defender
+	 * 
+	 * @param defender
+	 *            indicate the player is an defender during this game
+	 */
 	public void setDefender(Territory defender) {
 		this.defender = defender;
 	}
-	
+	/**
+	 * Method to get get defender in this territory
+	 * 
+	 * @return defender
+	 */
 	public Territory getDefender() {
 		return defender;
 	}
