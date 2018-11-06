@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 /**
  * 
- * The Map model. 
- * function. 
+ * The Map method handles its related functions
  *
  */
 public class RiskMap {
@@ -21,7 +20,10 @@ public class RiskMap {
 	private HashMap<String, LinkedList<String>> edgeMap;
 	
 	
-	
+	/**
+	 * Create a new and empty map when riskMap is null.
+	 * @return riskMap
+	 */
 	public static RiskMap getInstance() {
 		if (riskMap == null) {
 			riskMap = new RiskMap();
@@ -29,7 +31,10 @@ public class RiskMap {
 		
 		return riskMap;
 	}
-	
+	/**
+	 * a private RiskMap constructor
+	 * 
+	 */
 	private RiskMap() {
 		image = null;
 		continentMap = new HashMap<String, Continent>();
@@ -46,6 +51,11 @@ public class RiskMap {
 		edgeMap.clear();
 	}
 	
+	/**
+	 * save the image 
+	 * 
+	 * @param image
+	 */
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
@@ -66,7 +76,11 @@ public class RiskMap {
 	public void addContinent(Continent newContinent) {
 		continentMap.put(newContinent.getName(), newContinent);
 	}
-	
+	/**
+	 * Get the current Image.
+	 * 
+	 * @return continentMap.
+	 */
 	public HashMap<String, Continent> getContinentMap() {
 		return continentMap;
 	}
@@ -88,19 +102,36 @@ public class RiskMap {
 	public void updateTerritory(Territory territory) {
 		territoryMap.replace(territory.getName(), territory);
 	}
-	
+	/**
+	 * Get the territory map.
+	 * 
+	 * @return territoryMap.
+	 */
 	public HashMap<String, Territory> getTerritoryMap() {
 		return territoryMap;
 	}
-	
+	/**
+	 * method building connections among territories
+	 * 
+	 * @param territory
+	 * @param adjacentList
+	 */
 	public void addLink(String territory, LinkedList<String> adjacentList) {
 		edgeMap.put(territory, adjacentList);
 	}
-	
+	/**
+	 * method building connections among territories
+	 * 
+	 * @param newEdgeMap
+	 */
 	public void addLink(HashMap<String, LinkedList<String>> newEdgeMap) {
 		this.edgeMap = newEdgeMap;
 	}
-	
+	/**
+	 * Get the edge map.
+	 * 
+	 * @return edgeMap.
+	 */
 	public HashMap<String, LinkedList<String>> getEdgeMap() {
 		return edgeMap;
 	}
