@@ -16,7 +16,10 @@ import javax.swing.JPanel;
 
 import risk.controller.GameController;
 import risk.game.*;
-
+/**
+ * This class is the GUI for the Card Exchange View Panel, showing player
+ * exchange card for infantry if the player has more than 3 cards
+ */
 public class CardExchangeView extends JPanel implements Observer {
 
 	private Player currentPlayer;
@@ -29,6 +32,12 @@ public class CardExchangeView extends JPanel implements Observer {
 	private JButton clearButton;
 	private JButton exitButton;
 	
+	/**
+	 * Constructor with coming parameter
+	 * 
+	 * @override
+	 *            actionPerformed
+	 */
 	public CardExchangeView() {
 		buttonList = new LinkedList<JButton>();
 		exchangeButton = new JButton("Exchange");
@@ -56,7 +65,13 @@ public class CardExchangeView extends JPanel implements Observer {
 			selectedCards[i] = 0;
 		}
 	}
-	
+	/**
+	 * Method to update the hand cards view
+	 * @param obs
+	 *            obs with Oberservale type
+	 * @param arg1
+	 *            arg1 with Object type
+	 */
 	@Override
 	public void update(Observable obs, Object arg1) {
 		currentPlayer = ((Phase) obs).getCurrentPlayer();
@@ -64,7 +79,9 @@ public class CardExchangeView extends JPanel implements Observer {
 		exchangeBonusArmy = ((Phase) obs).getExchangeBonusArmy();
 		updateView();
 	}
-
+	/**
+	 * Method to reset the hand cards view
+	 */
 	private void reset() {
 		for (JButton button: buttonList) {
 			if (button.getText() != " ") {
@@ -77,7 +94,9 @@ public class CardExchangeView extends JPanel implements Observer {
 		exchangeButton.setEnabled(false);
 		clearButton.setEnabled(false);
 	}
-	
+	/**
+	 * Method to clear the hand cards view
+	 */
 	private void clear() {
 		buttonList.clear();
 		
@@ -85,7 +104,9 @@ public class CardExchangeView extends JPanel implements Observer {
 			selectedCards[i] = 0;
 		}
 	}
-	
+	/**
+	 * Method to update the hand cards view
+	 */
 	private void updateView() {
 		clear();
 		
@@ -164,7 +185,10 @@ public class CardExchangeView extends JPanel implements Observer {
 		revalidate();
 		repaint();
 	}
-	
+	/**
+	 * Method to check weather the card is valid
+	 * @ return true if it is vaild, otherwise retrun false
+	 */
 	private boolean isCardSetValid() {
 		for (int i = 0; i < 3; i++) {
 			if (selectedCards[i] == 3) {
@@ -178,7 +202,9 @@ public class CardExchangeView extends JPanel implements Observer {
 		
 		return false;
 	}
-	
+	/**
+	 * Method to exchange listener
+	 */
 	private class ExchangeListener implements ActionListener {
 
 		@Override
@@ -202,7 +228,9 @@ public class CardExchangeView extends JPanel implements Observer {
 			}
 		}
 	}
-	
+	/**
+	 * Method to update the clear listener
+	 */
 	private class ClearListener implements ActionListener {
 
 		@Override
@@ -210,7 +238,9 @@ public class CardExchangeView extends JPanel implements Observer {
 			reset();
 		}
 	}
-	
+	/**
+	 * Method to for card listener
+	 */
 	private class CardListener implements ActionListener {
 
 		@Override
