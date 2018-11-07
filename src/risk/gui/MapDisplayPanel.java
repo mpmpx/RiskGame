@@ -255,6 +255,11 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			GameController.getInstance().setAttack(attackerTerritory , defenderTerritory);
 		}
 		
+	/**
+	 * fortificationClick Method 
+	 *
+	 * @param territory with Territory type
+	 */
 		private void fortificationClick(Territory territory) {
 			if (territory != null && currentPlayer.getTerritoryMap().containsValue(territory)) {
 				
