@@ -20,7 +20,10 @@ import javax.swing.SpinnerNumberModel;
 
 import risk.game.*;
 import risk.controller.*;
-
+/**
+ * The main entrance of the game
+ *
+ */
 public class MapDisplayPanel extends JPanel implements Observer{
 
 	private Player currentPlayer;
@@ -34,7 +37,10 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	private HashMap<Point, Territory> locationMap;
 	private HashMap<String, LinkedList<Territory>> reachableMap;	
 	private HashMap<String, LinkedList<Territory>> attackableMap;
-	
+	/**
+	 * Create the application.
+	 * The constuctor method.
+	 */
 	public MapDisplayPanel() {
 		map = RiskMap.getInstance();
 		currentPlayer = null;
@@ -44,7 +50,11 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		territoryMap = new HashMap<String, Territory>();
 		locationMap = new HashMap<Point, Territory>();
 	}
-	
+	/**
+	 * Initialize method
+	 * @override
+	 * 	update method
+	 */
 	public void initialize() {
 		territoryMap = map.getTerritoryMap();
 		for (Territory territory : territoryMap.values()) {
@@ -87,7 +97,9 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		} 
 		repaint();
 	}
-	
+	/**
+	 * Method to paint the image
+	 */
 	private void paintImage() {
 		image = map.getImage();
 		for (Territory territory : territoryMap.values()) {
@@ -95,19 +107,35 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		}
 	}
 	
-	
+	/**
+	 * Method to paint the territory
+	 *
+	 * @param territory
+	 *		the selected territory that will be painted 
+	 * @param color
+	 *		the color that selected territory will be painted 
+	 */
 	private void paintTerritory(Territory territory, Color color) {
 		for (Point point : territory.getShape()) {
 			image.setRGB(point.x, point.y, color.getRGB());
 		}
 	}
-	
+	/**
+	 * Method to paint the componet
+	 *
+	 * @param g
+	 *	the selected component to be painted with Graphics type
+	 */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
         g.drawImage(image, 0, 0, null);
         drawArmyNumber(g);
     }	
-	
+	/**
+	 * Method to draw the number of army
+	 *
+	 * @param g with Graphic type
+	 */
 	private void drawArmyNumber(Graphics g) {
 		for (Territory territory : territoryMap.values()) {
 			g.setFont(new Font(Font.SANS_SERIF,  Font.BOLD, 12));
@@ -125,7 +153,10 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		
 		return null;
 	}
-	
+	/**
+	 * Listener method, in order to switch to different phase 
+	 *
+	 */
 	private class Listener implements MouseListener {
 
 		@Override
