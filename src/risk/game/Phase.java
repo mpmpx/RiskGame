@@ -15,13 +15,13 @@ public class Phase extends Observable {
 	private int currentPhase;
 	private Player currentPlayer;
 	private Player[] players;
-	private int playerIndex;
+	private int playerIndex; 
 	private int exchangeBonusArmy;
 	
 	private Territory attacker;
 	private Territory defender;
 	/**
-	 * Initialize the contents of the frame.
+	 * Initialize the contents of the phase.
 	 */
 	public void initialize() {
 		playerIndex = 0;
@@ -152,7 +152,13 @@ public class Phase extends Observable {
 	public Territory getDefender() {
 		return defender;
 	}
-	
+	/**
+	 * Method to add army in certain territory
+	 * @param territory
+	 *            indicate the territory that needs to add army
+	 * @param army
+	 *            indicate the current player 
+	 */
 	public void addArmy(String territory, int army) {
 		currentPlayer.addArmy(territory, army);
 		setChanged();
@@ -162,13 +168,22 @@ public class Phase extends Observable {
 			nextPhase();
 		}
 	}
-	
+	/**
+	 * Method to fortify army 
+	 * @param start
+	 * @param dest
+	 * @param army
+	 */
 	public void fortify(String start, String dest, int army) {
 		currentPlayer.addArmy(dest, army);
 		currentPlayer.removeArmy(start, army);
 		nextPhase();
 	}
-	
+	/**
+	 * Method to set the result of an attack
+	 * @param attackerCasulties
+	 * @param defenderCasulties
+	 */
 	public void setAttackResult(int attackerCasulties, int defenderCasulties) {
 		for (int i = 0; i < players.length; i++) {
 			if (players[i].getColor().equals(defender.getOwner())) {
@@ -182,7 +197,11 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+	/**
+	 * Method to conquer a territory
+	 * @param army
+	 *		the number of army during conquer
+	 */
 	public void conquerTerritory(int army) {
 		currentPlayer.conquer();
 		
@@ -225,7 +244,11 @@ public class Phase extends Observable {
 
 		checkAttackPhase();
 	}
-
+	/**
+	 * Method to check whether it is an attackphase.
+	 * @return true if the current phase is attack phase
+	 * 	and return false if it is not.
+	 */
 	public boolean checkAttackPhase() {		
 		if (currentPhase == Phase.ATTACK) {
 			for (Territory territory : currentPlayer.getTerritoryMap().values()) {
@@ -242,7 +265,10 @@ public class Phase extends Observable {
 		
 		return true;
 	}
-	
+	/**
+	 * Method to exchange cards
+	 * @param cards
+	 */
 	public void exchangeCards(LinkedList<Integer> cards) {
 		//currentPlayer.getCardSet().removeCards(cards);
 		currentPlayer.addExchangeBonusArmy(exchangeBonusArmy);
@@ -250,7 +276,10 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+	/**
+	 * Method to exchange BonusArmy 
+	 * @param exchangeBonusArmy
+	 */
 	public int getExchangeBonusArmy() {
 		return exchangeBonusArmy;
 	}
