@@ -25,7 +25,10 @@ import javax.swing.border.TitledBorder;
 
 import risk.game.*;
 import risk.controller.*;
-
+/**
+ * This class is the GUI for the Phase View Panel, showing the current phase of
+ * conquest game and current player
+ */
 public class PhaseView extends JPanel implements Observer{
 
 	private int currentPhase;
@@ -47,6 +50,10 @@ public class PhaseView extends JPanel implements Observer{
 	private Territory attacker;
 	private Territory defender;
 	
+	/**
+	 * constructor method initialize phase view panel
+	 * 
+	 */
 	public PhaseView() {
 		setLayout(new GridBagLayout());
 		
@@ -71,7 +78,9 @@ public class PhaseView extends JPanel implements Observer{
 
 		
 	}
-	
+	/**
+	 * Method to initialize
+	 */
 	public void initialize() {
 		exchangeDialog = new JDialog(MainFrame.getInstance(), "Card Exchange", true);
 
@@ -88,7 +97,11 @@ public class PhaseView extends JPanel implements Observer{
 		this.cardExchangeView = cardExchangeView;
 
 	}
-	
+	/**
+	 * Method to update the phase view
+	 * @ param Observable obs
+	 * @ param Object arg
+	 */
 	@Override
 	public void update(Observable obs, Object arg) {
 		currentPhase = ((Phase) obs).getCurrentPhase();
@@ -112,7 +125,9 @@ public class PhaseView extends JPanel implements Observer{
 		
 		updateView();
 	}
-	
+	/**
+	 * Method to update the phase view
+	 */
 	private void updateView() {
 		removeAll();
 		switch (currentPhase) {
@@ -137,7 +152,9 @@ public class PhaseView extends JPanel implements Observer{
 		revalidate();
 		repaint();	
 	}
-	
+	/**
+	 * Method to update the start up phase view
+	 */
 	private void updateStartupPhaseView() {
 		GridBagConstraints c = new GridBagConstraints();
 		Border colorBorder = BorderFactory.createLineBorder(currentPlayer.getColor(), 10);
@@ -162,7 +179,10 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridy = 1;
 		add(nextButton, c);		
 	}
-	
+	/**
+	 * Method to update the reinforcement phase view
+	 * @ override actionPerformed
+	 */
 	private void updateReinforcementPhaseView() {
 		GridBagConstraints c = new GridBagConstraints();
 		Border colorBorder = BorderFactory.createLineBorder(currentPlayer.getColor(), 10);
@@ -213,7 +233,9 @@ public class PhaseView extends JPanel implements Observer{
 			exchangeDialog.setVisible(true);
 		}
 	}
-	
+	/**
+	 * Method to update the attack phase view
+	 */
 	private void updateAttackPhaseView() {
 		GridBagConstraints c = new GridBagConstraints();
 		Border colorBorder = BorderFactory.createLineBorder(currentPlayer.getColor(), 10);
@@ -328,7 +350,9 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridy = 3;
 		add(nextButton, c);
 	}
-	
+	/**
+	 * Method to update the fortication phase view
+	 */
 	private void updateFortificationPhaseView() {
 		GridBagConstraints c = new GridBagConstraints();
 		Border colorBorder = BorderFactory.createLineBorder(currentPlayer.getColor(), 10);
@@ -354,7 +378,9 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridy = 1;
 		add(nextButton, c);		
 	}
-	
+	/**
+	 * Method for attacker and defender to roll the random dice
+	 */
 	private void rollDice(int attackerDiceNum, int defenderDiceNum) {
 		int attackerCasulties = 0;
 		int defenderCasulties = 0;
@@ -437,7 +463,10 @@ public class PhaseView extends JPanel implements Observer{
 		}
 		
 	}
-	
+	/**
+	 * Method to add attack phase button listener
+	 * @ override actionPerformed
+	 */
 	private class AttackPhaseButtonListener implements ActionListener {
 
 		@Override
@@ -461,7 +490,11 @@ public class PhaseView extends JPanel implements Observer{
 		
 		
 	}
-	
+	/**
+	 * Method add button listener
+	 * @ override
+	 * 	actionPerformed
+	 */
 	private class ButtonListener implements ActionListener {
 
 		@Override
