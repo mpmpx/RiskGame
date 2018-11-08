@@ -8,12 +8,19 @@ import java.awt.Point;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+/**
+ * The panel of the game
+ *
+ */
 public class GamePanel extends JPanel {
     private MapDisplayPanel mapDisplayPanel;
     private PhaseView phaseView;
     private DominationView dominationView;
 	private CardExchangeView cardExchangeView;
-    
+    	
+	/**
+	 * Constructor method
+	 */
 	public GamePanel() {
 		mapDisplayPanel = new MapDisplayPanel();
 		phaseView = new PhaseView();
@@ -21,7 +28,10 @@ public class GamePanel extends JPanel {
 		cardExchangeView = new CardExchangeView();
 		phaseView.setCardExchangeView(cardExchangeView);
 	}
-
+	/**
+	 * Initialize the contents of the panel
+	 * 
+	 */
 	public void initialize() {
 		mapDisplayPanel.initialize();
 		phaseView.initialize();
@@ -37,19 +47,35 @@ public class GamePanel extends JPanel {
 		add(dominationView);
 		add(phaseView);
 	}
-	
+	/**
+	 * Return the current phase view
+	 * 
+	 * @return phaseView
+	 */
 	public PhaseView getPhaseView() {
 		return phaseView;
 	}
-	
+	/**
+	 * Return the current map panel
+	 * 
+	 * @return mapDisplayPanel
+	 */
 	public MapDisplayPanel getMapDisplayPanel() {
 		return mapDisplayPanel;
 	}
-	
+	/**
+	 * Return the current domination view
+	 * 
+	 * @return dominationView
+	 */
 	public DominationView getDominationView() {
 		return dominationView;
 	}
-	
+	/**
+	 * Return the current card Exchane view
+	 * 
+	 * @return cardExchangeView
+	 */
 	public CardExchangeView getCardExchangeView() {
 		return cardExchangeView;
 	}	
