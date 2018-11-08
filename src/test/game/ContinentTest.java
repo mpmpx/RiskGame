@@ -1,13 +1,11 @@
-package test.game;
+package game;
 
 import static org.junit.Assert.*;
 
 import java.awt.Point;
 import java.util.LinkedList;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,7 +24,6 @@ public class ContinentTest {
 	
 	@Test
 	public void testSetName() {
-		continent.setName("Africa");
 		assertEquals(newName, continent.getName());
 		System.out.println("Successfully set the name of continent with " + newName + ".");
 	}

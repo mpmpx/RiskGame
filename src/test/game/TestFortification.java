@@ -34,6 +34,7 @@ public class TestFortification {
 	@Before
 	public void before() {
 		map = RiskMap.getInstance();
+		map.clear();
 		controller = new ReadFileController();
 		rootDir = (Paths.get("").toAbsolutePath().toString());
 		player = new Player("player");
@@ -72,7 +73,7 @@ public class TestFortification {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testFortification() {
 		player.fortification();
 		
 		assertEquals(result, player.getReachableMap());

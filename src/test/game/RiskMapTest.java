@@ -1,18 +1,15 @@
-package test.game;
+package game;
 
 import static org.junit.Assert.*;
 
 import java.awt.Point;
 import java.util.LinkedList;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import risk.game.Continent;
-import risk.game.Player;
 import risk.game.RiskMap;
 import risk.game.Territory;
 
@@ -20,15 +17,16 @@ public class RiskMapTest {
 	
 	RiskMap map = RiskMap.getInstance();
 	Continent testContinent = new Continent("Asia", 5);
-	private int key;
 	
 	@BeforeClass
 	public static void beforeTest() {
 		System.out.println("Start to test RiskMapTest.");
 	}
 	
+	
 	@Test
 	public void testaddContinent() {
+		map.clear();
 		Continent newContinent = new Continent("Afric", 5);
 		
 		map.getContinentMap().put(testContinent.getName(), testContinent);
@@ -87,9 +85,7 @@ public class RiskMapTest {
 		String name = "Africa";
 		String nameNew = "Africa1";
 		Point location = new Point(100,100);
-		Point locationNew= new Point(200,200);
 		Territory newTerritory = new Territory(name,location);
-		Territory newTerritoryNew= new Territory(nameNew,locationNew);
 		
 		map.addTerritory(newTerritory);
 		

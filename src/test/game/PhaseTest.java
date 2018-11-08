@@ -1,8 +1,7 @@
-package test.game;
+package game;
 
 import static org.junit.Assert.*;
 
-import java.util.LinkedList;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import risk.game.Phase;

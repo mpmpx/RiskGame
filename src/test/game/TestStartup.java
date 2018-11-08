@@ -34,7 +34,7 @@ public class TestStartup {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testStartup() {
 		
 		player.addArmy(territoryMap.get("a").getName(), 12);
 		player.addArmy(territoryMap.get("b").getName(), 8);

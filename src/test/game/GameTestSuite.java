@@ -12,7 +12,14 @@ import org.junit.runners.Suite.SuiteClasses;
 				TestFortification.class,
 				TestGetCardValidation.class,
 				TestReinforcementArmies.class,
-				TestStartup.class
+				TestStartup.class,
+				CardsTest.class,
+				ContinentTest.class,
+				PlayerTest.class,
+				PlayerColorTest.class,
+				RiskMapTest.class,
+				TerritoryTest.class,
+				PhaseTest.class
 				})
 
 public class GameTestSuite {   

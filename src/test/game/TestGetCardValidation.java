@@ -12,6 +12,7 @@ import org.junit.Test;
 import risk.game.Continent;
 import risk.game.Phase;
 import risk.game.Player;
+import risk.game.PlayerColor;
 import risk.game.RiskMap;
 import risk.game.Territory;
 
@@ -33,7 +34,9 @@ public class TestGetCardValidation {
 
 	@Before
 	public void before() {
+		PlayerColor.reset();
 		map = RiskMap.getInstance();
+		map.clear();
 		map.addContinent(new Continent("continent", 5));
 
 		
@@ -72,7 +75,7 @@ public class TestGetCardValidation {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testGetCard() {
 		// Did not conquer a territory.
 		attacker.getCard();
 		assertEquals(0, attacker.getCardSet().getSize());

@@ -22,4 +22,8 @@ public class PlayerColor {
 			return colors[index++];
 		}
 	}
+	
+	public static void reset() {
+		index = 0;
+	}
 }

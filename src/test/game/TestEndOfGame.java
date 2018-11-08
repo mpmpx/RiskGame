@@ -34,6 +34,7 @@ public class TestEndOfGame {
 	@Before
 	public void before() {
 		map = RiskMap.getInstance();
+		map.clear();
 		map.addContinent(new Continent("continent", 5));
 
 		
@@ -72,7 +73,7 @@ public class TestEndOfGame {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testEndGame() {
 		phase.conquerTerritory(2);
 		
 		assertEquals(attacker.getTerritoryMap().values().size(), map.getTerritoryMap().values().size());

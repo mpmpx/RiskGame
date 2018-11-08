@@ -72,7 +72,7 @@ public class TestConqueringValidation {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testConquering() {
 		
 		phase.conquerTerritory(2);
 		// make sure a player is removed.
