@@ -163,7 +163,6 @@ public class CardExchangeView extends JPanel implements Observer {
 		
 		c.weightx = 0;
 		c.weighty = 1;
-		//c.gridwidth = (int) Math.floor(buttonList.size() / 3);
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridx = 0;
 		c.gridy = 1;
