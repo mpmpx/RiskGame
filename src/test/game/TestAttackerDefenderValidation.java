@@ -31,7 +31,7 @@ public class TestAttackerDefenderValidation {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testAttackerDefender() {
 		
 		phase.setAttack(attacker, defender);
 		assertEquals(attacker, phase.getAttacker());

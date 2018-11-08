@@ -1,4 +1,4 @@
-package test.game;
+package game;
 
 import static org.junit.Assert.*;
 
@@ -87,7 +87,6 @@ public class TerritoryTest {
 		Point newPoint1 = new Point(100,201); 
 		Point newPoint2 = new Point(100,202); 
 		Point newPoint3 = new Point(100,203); 
-		Point newPoint4 = new Point(100,204); 
 			
 		shape.add(newPoint1);
 		shape.add(newPoint2);

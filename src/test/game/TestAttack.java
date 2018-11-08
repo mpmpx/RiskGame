@@ -62,7 +62,7 @@ public class TestAttack {
 	}
 	
 	@Test
-	public void testReinforcementCalculation() {
+	public void testAttackPhase() {
 		player2.attack();
 		
 		assertEquals(result, player2.getAttackableMap());

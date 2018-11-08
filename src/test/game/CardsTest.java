@@ -1,4 +1,4 @@
-package test.game;
+package game;
 
 import static org.junit.Assert.*;
 import org.junit.AfterClass;
@@ -40,13 +40,6 @@ public class CardsTest {
 		System.out.println("Successfully removeCards. " ); 
 	}
 	
-	@Test
-	public void testremoveCards() {	
-		newCards.getCard();   
-		newCards.removeCards(newCards.getAllCards());
-		assertEquals(0, newCards.getAllCards().size()); 
-		System.out.println("Successfully removeCards. " ); 
-	}
 	
 	@AfterClass
 	public static void afterTest() {

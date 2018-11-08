@@ -1,17 +1,13 @@
-package test.game;
+package game;
 
 import static org.junit.Assert.*;
 
 import java.awt.Point;
-import java.util.LinkedList;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import risk.game.Continent;
 import risk.game.Player;
 import risk.game.Territory;
 
@@ -57,7 +53,6 @@ public class PlayerTest {
 	@Test
 	public void testgetReinforcement() {
 		newzPlayer.reinforcement();
-		int num = newzPlayer.getTotalArmy();
 		assertEquals(3, newzPlayer.getTotalArmy());
 		assertEquals(3, newzPlayer.getUnassignedArmy());
 		System.out.println("Successfully test getReinforcement.");
