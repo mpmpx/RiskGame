@@ -15,7 +15,10 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 
 import risk.game.*;
-
+/**
+ * Class acting as the ReadFile's controller, in order to access different needed files. 
+ * 
+ */
 public class ReadFileController {
 
 	private HashMap<String, Continent> continentMap;
@@ -26,6 +29,9 @@ public class ReadFileController {
 	
 	private boolean bMap, bContinent, bTerritory;
 	
+	/**
+	 * Constructor Method
+	 */
 	public ReadFileController() {
 		continentMap = new HashMap<String, Continent>();
 		territoryMap = new HashMap<String, Territory>();
@@ -37,9 +43,13 @@ public class ReadFileController {
 		bTerritory = false;
 	}
 	
+	/**
+	 * Method to check name
+	 * @throws IOException if the block name is invalid
+	 */
     private void validateBlockName() throws Exception  {
         if (!(bMap && bContinent && bTerritory)) {
-            throw new Exception("bolck name is invalid!");
+            throw new Exception("block name is invalid!");
         }
     }
 
@@ -137,7 +147,10 @@ public class ReadFileController {
     		}
     	}
     }
-    
+    /**
+     * Method to get territory shape
+     * @param territory
+     */
     private LinkedList<Point> getTerritoryShape(Territory territory) {
     	LinkedList<Point> shape = new LinkedList<Point>();
     	Point location = territory.getLocation();
