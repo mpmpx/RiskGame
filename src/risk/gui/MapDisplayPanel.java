@@ -182,7 +182,8 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				}
 			}
 		}
-
+		
+		//Startup Click
 		private void startupClick(Territory territory) {
 			if (territory != null && currentPlayer.getTerritoryMap().containsValue(territory)) {
 				
@@ -203,11 +204,13 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				}
 			}
 		}
+			
 		
+		// Reinforcement Click
 		private void reinforcementClick(Territory territory) {
 			startupClick(territory);
 		}
-		
+		// Attack Click
 		private void attackClick(Territory territory) {
 			if (territory != null) {
 				// select attacker territory
@@ -255,11 +258,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			GameController.getInstance().setAttack(attackerTerritory , defenderTerritory);
 		}
 		
-	/**
-	 * fortificationClick Method 
-	 *
-	 * @param territory with Territory type
-	 */
+		// Fortification Click
 		private void fortificationClick(Territory territory) {
 			if (territory != null && currentPlayer.getTerritoryMap().containsValue(territory)) {
 				
