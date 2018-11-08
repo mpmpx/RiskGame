@@ -3,8 +3,9 @@ package risk.game;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedList;
+
 /**
- * This class represents all of the data and funcionality that related to map
+ * This class represents all of the data and functionality that related to map
  */
 
 public class RiskMap {
@@ -30,6 +31,7 @@ public class RiskMap {
 		
 		return riskMap;
 	}
+	
 	/**
 	 * a private RiskMap constructor
 	 * 
@@ -40,6 +42,7 @@ public class RiskMap {
 		territoryMap = new HashMap<String, Territory>();
 		edgeMap = new HashMap<String, LinkedList<String>>();
 	}
+	
 	/**
 	 * Initial function of the class, normalize the local variables.
 	 */
@@ -58,6 +61,7 @@ public class RiskMap {
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
+	
 	/**
 	 * Return the current Image.
 	 * 
@@ -66,6 +70,7 @@ public class RiskMap {
 	public BufferedImage getImage() {
 		return image;
 	}
+	
 	/**
 	 * Add a qualified continent to the local variables.
 	 * 
@@ -75,6 +80,7 @@ public class RiskMap {
 	public void addContinent(Continent newContinent) {
 		continentMap.put(newContinent.getName(), newContinent);
 	}
+	
 	/**
 	 * Get the current Image.
 	 * 
@@ -83,6 +89,7 @@ public class RiskMap {
 	public HashMap<String, Continent> getContinentMap() {
 		return continentMap;
 	}
+	
 	/**
 	 * Add a qualified territory to the local variables.
 	 * 
@@ -93,6 +100,7 @@ public class RiskMap {
 	public void addTerritory(Territory territory) {
 		territoryMap.put(territory.getName(), territory);
 	}
+	
 	/**
 	 * updating the territory information, and replace it with thhe new territory name.
 	 * 
@@ -101,6 +109,7 @@ public class RiskMap {
 	public void updateTerritory(Territory territory) {
 		territoryMap.replace(territory.getName(), territory);
 	}
+	
 	/**
 	 * Get the territory map.
 	 * 
@@ -109,6 +118,7 @@ public class RiskMap {
 	public HashMap<String, Territory> getTerritoryMap() {
 		return territoryMap;
 	}
+	
 	/**
 	 * method building connections among territories
 	 * 
@@ -118,6 +128,7 @@ public class RiskMap {
 	public void addLink(String territory, LinkedList<String> adjacentList) {
 		edgeMap.put(territory, adjacentList);
 	}
+	
 	/**
 	 * method building connections among territories
 	 * 
@@ -126,6 +137,7 @@ public class RiskMap {
 	public void addLink(HashMap<String, LinkedList<String>> newEdgeMap) {
 		this.edgeMap = newEdgeMap;
 	}
+	
 	/**
 	 * Get the edge map.
 	 * 

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
 /**
- * This class represents all of the data and funcionality that a player would
+ * This class represents all of the data and functionality that a player would
  * have. All of the actions that a player would do eventually comes back to this
  * class.
  */
@@ -26,6 +26,7 @@ public class Player{
 	private int freeArmy;
 	
 	private boolean hasConquered;
+	
 	/**
 	 * Constructor method
 	 * 
@@ -46,12 +47,14 @@ public class Player{
 		freeArmy = 0;
 		hasConquered = false;
 	}
+	
 	/**
 	 * Method to reinforce by implementing the selected strategy
 	 */
 	public void reinforcement() {
 		getReinforcement();
 	}
+	
 	/**
 	 * Method to attack by implementing the selected strategy
 	 */
@@ -61,6 +64,7 @@ public class Player{
 			attackableMap.put(territory.getName(), getAttackableList(territory));
 		}
 	}
+	
 	/**
 	 * Method to fortify by implementing the selected strategy
 	 */
@@ -70,6 +74,7 @@ public class Player{
 			reachableMap.put(territory.getName(), getReachableList(territory));
 		}
 	}
+	
 	/**
 	 * Method to update continent
 	 */
@@ -87,6 +92,7 @@ public class Player{
 			}
 		}
 	}
+	
 	/**
 	 * Private method to reinforce
 	 */
@@ -103,19 +109,21 @@ public class Player{
 		
 		totalArmy += unassignedArmy;
 	}
+	
 	/**
-	 * Method to get a list of terrortories that are attackable
+	 * Method to get a list of territories that are attackable
 	 * @return attackableMap
 	 */
 	public HashMap<String, LinkedList<Territory>> getAttackableMap() {
 		return attackableMap;
 	}
+	
 	/**
 	 * This class will take in a territory as well as the territory it is going to
 	 * attack. It will return the list of the object of the territory it wants to attack if
 	 * the player is allowed to attack that country
-	 * @ param territory
-	 * @ return attackableList
+	 * @param territory
+	 * @return attackableList
 	 */
 	private LinkedList<Territory> getAttackableList(Territory territory) {
 		LinkedList<Territory> attackableList = new LinkedList<Territory>();
@@ -131,18 +139,20 @@ public class Player{
 		
 		return attackableList;
 	}
+	
 	/**
-	 * Method to get a hashmap of terrortories that is reachable
+	 * Method to get a hash map of territories that is reachable
 	 * @return reachableMap
 	 */
 	public HashMap<String, LinkedList<Territory>> getReachableMap() {
 		return reachableMap;
 	}
+	
 	/**
 	 * This class will take in a territory as well as the territory it is going to
 	 * reach . It will return the list of the object of the territory which is reachable
-	 * @ param territory
-	 * @ return reachableList
+	 * @param territory
+	 * @return reachableList
 	 */
 	private LinkedList<Territory> getReachableList(Territory territory) {
 		LinkedList<Territory> reachableList = new LinkedList<Territory>();
@@ -170,6 +180,7 @@ public class Player{
 		
 		return reachableList;
 	}
+	
 	/**
 	 * Method to set unsigned army, after signed, the total army will increase
 	 * 
@@ -184,6 +195,7 @@ public class Player{
 			RiskMap.getInstance().updateTerritory(territory);
 		}
 	}
+	
 	/**
 	 * To get the player's name
 	 * 
@@ -192,6 +204,7 @@ public class Player{
 	public String getName() {
 		return name;
 	}
+	
 	/**
 	 * To get the player's color
 	 * 
@@ -211,6 +224,7 @@ public class Player{
 		ownedTerritoryNum++;
 		updateControlledContinent();
 	}
+	
 	/**
 	 * To remove a territory from the player's territory list
 	 * 
@@ -223,11 +237,12 @@ public class Player{
 		ownedTerritoryNum--;
 		updateControlledContinent();
 	}
+	
 	/**
 	 * To find a territory using coordinator x and y
 	 * 
 	 * @param x, y
-	 *            the coodinator of the point to indicate a territory
+	 *            the coordinator of the point to indicate a territory
 	 */
 	public Territory findTerritory(int x, int y) {
 		for (Territory territory : territoryMap.values()) {
@@ -238,6 +253,7 @@ public class Player{
 		}
 		return null;
 	}
+	
 	/**
 	 * To get the territory' map
 	 * 
@@ -246,22 +262,25 @@ public class Player{
 	public HashMap<String, Territory> getTerritoryMap() {
 		return territoryMap;
 	}
+	
 	/**
 	 * To get the number of unassigned army
 	 * 
-	 * @return unassignedArmy with type int
+	 * @return number of unassigned armies. 
 	 */
 	public int getUnassignedArmy() {
 		return unassignedArmy;
 	}
+	
 	/**
 	 * To get the number of total army
 	 * 
-	 * @return total with type int
+	 * @return total number of armies.
 	 */
 	public int getTotalArmy() {
 		return totalArmy;
 	}
+	
 	/**
 	 * To get the initial army 
 	 * 
@@ -270,14 +289,16 @@ public class Player{
 	public int getFreeArmy() {
 		return freeArmy;
 	}
+	
 	/**
 	 * To get the controlled continent 
 	 * 
-	 * @return the controlledContinent with type linkedlist
+	 * @return the controlledContinent with type linked list
 	 */
 	public LinkedList<Continent> getControlledContinent() {
 		return controlledContinent;
 	}
+	
 	/**
 	 * To add the number of army according to territory
 	 * 
@@ -291,6 +312,7 @@ public class Player{
 		RiskMap.getInstance().updateTerritory(territoryMap.get(territory));
 		unassignedArmy -= army;
 	}
+	
 	/**
 	 * To remove the number of army according to territory
 	 * 
@@ -303,6 +325,7 @@ public class Player{
 		territoryMap.get(territory).removeArmy(army);
 		RiskMap.getInstance().updateTerritory(territoryMap.get(territory));
 	}
+	
 	/**
 	 * To get the number of killed army according to territory
 	 * 
@@ -315,6 +338,7 @@ public class Player{
 		removeArmy(territory, army);
 		totalArmy -= army;
 	}
+	
 	/**
 	 * Method to check if the player lose the game
 	 * 
@@ -323,6 +347,7 @@ public class Player{
 	public boolean hasConquered() {
 		return hasConquered;
 	}
+	
 	/**
 	 * Method to check whether player conquered at least one country
 	 * 
@@ -331,6 +356,7 @@ public class Player{
 	public void conquer() {
 		hasConquered = true;
 	}
+	
 	/**
 	 * To give the player the hand cards
 	 */
@@ -340,6 +366,7 @@ public class Player{
 			hasConquered = false;
 		}
 	}
+	
 	/**
 	 * To get the player's hand cards list
 	 * 
@@ -348,6 +375,7 @@ public class Player{
 	public Cards getCardSet() {
 		return cards;
 	}
+	
 	/**
 	 * To get the initial army bonus in the setup phase
 	 * 

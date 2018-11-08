@@ -99,8 +99,8 @@ public class PhaseView extends JPanel implements Observer{
 	}
 	/**
 	 * Method to update the phase view
-	 * @ param Observable obs
-	 * @ param Object arg
+	 * @param Observable observable class
+	 * @param Object argument.
 	 */
 	@Override
 	public void update(Observable obs, Object arg) {
@@ -181,7 +181,6 @@ public class PhaseView extends JPanel implements Observer{
 	}
 	/**
 	 * Method to update the reinforcement phase view
-	 * @ override actionPerformed
 	 */
 	private void updateReinforcementPhaseView() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -465,7 +464,6 @@ public class PhaseView extends JPanel implements Observer{
 	}
 	/**
 	 * Method to add attack phase button listener
-	 * @ override actionPerformed
 	 */
 	private class AttackPhaseButtonListener implements ActionListener {
 
@@ -492,8 +490,6 @@ public class PhaseView extends JPanel implements Observer{
 	}
 	/**
 	 * Method add button listener
-	 * @ override
-	 * 	actionPerformed
 	 */
 	private class ButtonListener implements ActionListener {
 

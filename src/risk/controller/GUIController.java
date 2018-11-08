@@ -16,6 +16,10 @@ public class GUIController {
 	private static GUIController controller; 
 	private MainFrame mainFrame;
 	
+	/**
+	 * Get the instance of this class.
+	 * @return an instance of this class.
+	 */
 	public static GUIController getInstance() {
 		if (controller == null) {
 			controller = new GUIController();
@@ -23,12 +27,14 @@ public class GUIController {
 		
 		return controller;
 	}
+	
 	/**
 	 * Constructor Method
 	 */
 	private GUIController() {
 		mainFrame = MainFrame.getInstance();
 	}
+	
 	/**
 	 * Method to get phase view
 	 * @return getPhaseView
@@ -37,6 +43,7 @@ public class GUIController {
 	public PhaseView getPhaseView() {
 		return mainFrame.getGamePanel().getPhaseView();
 	}
+	
 	/**
 	 * Method to get map Display Panel
 	 * @return MapDisplayPanel
@@ -45,6 +52,7 @@ public class GUIController {
 	public MapDisplayPanel getMapDisplayPanel() {
 		return mainFrame.getGamePanel().getMapDisplayPanel();
 	}
+	
 	/**
 	 * Method to get DominationView
 	 * @return DominationView
@@ -53,6 +61,7 @@ public class GUIController {
 	public DominationView getDominationView() {
 		return mainFrame.getGamePanel().getDominationView();
 	}
+	
 	/**
 	 * Method to get getCardExchangeView
 	 * @return CardExchangeView
@@ -61,6 +70,7 @@ public class GUIController {
 	public CardExchangeView getCardExchangeView() {
 		return mainFrame.getGamePanel().getCardExchangeView();
 	}
+	
 	/**
 	 * Method to notify which player has won the game
 	 * @param winner

@@ -12,6 +12,7 @@ public class Continent {
 	private String name;
 	private int value;
 	private LinkedList<String> territoryList;
+	
 	/**
 	 * constructor method with incoming parameters.
 	 * 
@@ -25,6 +26,7 @@ public class Continent {
 		this.value = value;
 		territoryList = new LinkedList<String>();
 	}
+	
 	/**
 	 * method to get a continent's name
 	 * 
@@ -33,6 +35,7 @@ public class Continent {
 	public String getName() {
 		return name;
 	}
+	
 	/**
 	 * method to get a continent's value.
 	 * 
@@ -41,6 +44,7 @@ public class Continent {
 	public int getValue() {
 		return value;
 	}
+	
 	/**
 	 * method to add new territory
 	 * 
@@ -53,6 +57,7 @@ public class Continent {
 			territoryList.add(newTerritory.getName());	
 		}
 	}
+	
 	/**
 	 * method to remove one territory
 	 * 
@@ -62,6 +67,7 @@ public class Continent {
 	public void removeTerritory(Territory territory) {
 		territoryList.remove(territory.getName());
 	}
+	
 	/**
 	 * method to get a list of the territoy's Map 
 	 * 
@@ -70,10 +76,11 @@ public class Continent {
 	public LinkedList<String> getTerritoryMap() {
 		return territoryList;
 	}
+	
 	/**
 	 * method to check if the territoryList is owned
-	 * @ param territoryList
-	 * @ return ture or false
+	 * @param territoryList
+	 * @return true or false
 	 */
 	public boolean isOwned(LinkedList<String> territoryList) {
 		HashMap<String, Boolean> visited = new HashMap<String, Boolean>();

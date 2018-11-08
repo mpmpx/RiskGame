@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 
 import risk.controller.GameController;
 import risk.game.*;
+
 /**
  * This class is the GUI for the Card Exchange View Panel, showing player
  * exchange card for infantry if the player has more than 3 cards
@@ -65,12 +66,11 @@ public class CardExchangeView extends JPanel implements Observer {
 			selectedCards[i] = 0;
 		}
 	}
+	
 	/**
-	 * Method to update the hand cards view
-	 * @param obs
-	 *            obs with Oberservale type
-	 * @param arg1
-	 *            arg1 with Object type
+	 * Method to update the CardExchange view
+	 * @param Observable observable class
+	 * @param Object argument.
 	 */
 	@Override
 	public void update(Observable obs, Object arg1) {
@@ -79,6 +79,7 @@ public class CardExchangeView extends JPanel implements Observer {
 		exchangeBonusArmy = ((Phase) obs).getExchangeBonusArmy();
 		updateView();
 	}
+	
 	/**
 	 * Method to reset the hand cards view
 	 */
@@ -94,6 +95,7 @@ public class CardExchangeView extends JPanel implements Observer {
 		exchangeButton.setEnabled(false);
 		clearButton.setEnabled(false);
 	}
+	
 	/**
 	 * Method to clear the hand cards view
 	 */
@@ -104,6 +106,7 @@ public class CardExchangeView extends JPanel implements Observer {
 			selectedCards[i] = 0;
 		}
 	}
+	
 	/**
 	 * Method to update the hand cards view
 	 */
@@ -184,9 +187,10 @@ public class CardExchangeView extends JPanel implements Observer {
 		revalidate();
 		repaint();
 	}
+	
 	/**
 	 * Method to check weather the card is valid
-	 * @ return true if it is vaild, otherwise retrun false
+	 * @ return true if it is valid, otherwise return false
 	 */
 	private boolean isCardSetValid() {
 		for (int i = 0; i < 3; i++) {
@@ -201,6 +205,7 @@ public class CardExchangeView extends JPanel implements Observer {
 		
 		return false;
 	}
+	
 	/**
 	 * Method to exchange listener
 	 */
@@ -227,6 +232,7 @@ public class CardExchangeView extends JPanel implements Observer {
 			}
 		}
 	}
+	
 	/**
 	 * Method to update the clear listener
 	 */
@@ -237,6 +243,7 @@ public class CardExchangeView extends JPanel implements Observer {
 			reset();
 		}
 	}
+	
 	/**
 	 * Method to for card listener
 	 */

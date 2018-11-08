@@ -22,6 +22,7 @@ public class DominationView extends JPanel implements Observer{
 
 	Player[] players;
 	LinkedList<JTextArea> textAreaList;
+	
 	/**
 	 * Constructor method
 	 * 
@@ -30,6 +31,7 @@ public class DominationView extends JPanel implements Observer{
 		players = new Player[6];
 		textAreaList = new LinkedList<JTextArea>();
 	}
+	
 	/**
 	 * Initialization method
 	 * 
@@ -39,12 +41,11 @@ public class DominationView extends JPanel implements Observer{
 		setPreferredSize(new Dimension(200, 750));
 		setLayout(new GridLayout(6, 1));
 	}
+	
 	/**
-	 * Method to update the domination view
-	 * @param obs
-	 *            obs with Oberservale type
-	 * @param arg1
-	 *            arg1 with Object type
+	 * Method to update the phase view
+	 * @param Observable observable class
+	 * @param Object argument.
 	 */
 	@Override
 	public void update(Observable obs, Object object) {
@@ -77,6 +78,7 @@ public class DominationView extends JPanel implements Observer{
 		
 		updateView();
 	}
+	
 	/**
 	 * Method to update the domination view
 	 */

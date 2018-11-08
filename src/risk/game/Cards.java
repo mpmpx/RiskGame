@@ -13,12 +13,14 @@ public class Cards {
 	public final static int CANNON = 2;
 	
 	private LinkedList<Integer> cards;
+	
 	/**
 	 * Constructor for Card class
 	 */
 	public Cards() {
 		cards = new LinkedList<Integer>();
 	}
+	
 	/**
 	 * method to add card 
 	 * 
@@ -37,14 +39,16 @@ public class Cards {
 		Random r = new Random();
 		addCard(r.nextInt(3));
 	}
+	
 	/**
 	 * To get the hand card
 	 * 
-	 * @return the hand card with int type with a linkedlist 
+	 * @return the hand card with int type with a linked list 
 	 */
 	public LinkedList<Integer> getAllCards() {
 		return cards;
 	}
+	
 	/**
 	 * To get the size of the hand card
 	 * 
@@ -53,6 +57,7 @@ public class Cards {
 	public int getSize() {
 		return cards.size();
 	}
+	
 	/**
 	 * method to remove cards
 	 * @param cards

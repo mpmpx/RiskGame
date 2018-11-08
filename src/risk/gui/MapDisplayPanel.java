@@ -39,7 +39,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	private HashMap<String, LinkedList<Territory>> attackableMap;
 	/**
 	 * Create the application.
-	 * The constuctor method.
+	 * The constructor method.
 	 */
 	public MapDisplayPanel() {
 		map = RiskMap.getInstance();
@@ -52,8 +52,6 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	}
 	/**
 	 * Initialize method
-	 * @override
-	 * 	update method
 	 */
 	public void initialize() {
 		territoryMap = map.getTerritoryMap();
@@ -70,6 +68,11 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		this.addMouseListener(new Listener());
 	}
 	
+	/**
+	 * Method to update the MapDisplayPanel view
+	 * @param Observable observable class
+	 * @param Object argument.
+	 */
 	@Override
 	public void update(Observable obs, Object arg) {
 		currentPhase = ((Phase) obs).getCurrentPhase();
@@ -120,6 +123,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			image.setRGB(point.x, point.y, color.getRGB());
 		}
 	}
+	
 	/**
 	 * Method to paint the componet
 	 *
@@ -131,6 +135,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
         g.drawImage(image, 0, 0, null);
         drawArmyNumber(g);
     }	
+    
 	/**
 	 * Method to draw the number of army
 	 *
@@ -144,6 +149,12 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		}
 	}
 		
+	/**
+	 * select a territory based on give xy-coordinator.
+	 * @param x x coordinate of the territory
+	 * @param y y coordinate of the territory
+	 * @return a territory based on give xy-coordinator.
+	 */
 	private Territory selectTerritory(int x, int y) {
 		for (Territory territory : RiskMap.getInstance().getTerritoryMap().values()) {
 			if (territory.contains(new Point(x, y))) {
@@ -153,6 +164,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		
 		return null;
 	}
+	
 	/**
 	 * Listener method, in order to switch to different phase 
 	 *
@@ -183,7 +195,11 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			}
 		}
 		
-		//Startup Click
+		
+		/**
+		 * Click when in the startup phase.
+		 * @param territory selected territory
+		 */
 		private void startupClick(Territory territory) {
 			if (territory != null && currentPlayer.getTerritoryMap().containsValue(territory)) {
 				
@@ -206,11 +222,18 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		}
 			
 		
-		// Reinforcement Click
+		/**
+		 * Click when in the reinforcement phase.
+		 * @param territory selected territory
+		 */
 		private void reinforcementClick(Territory territory) {
 			startupClick(territory);
 		}
-		// Attack Click
+
+		/**
+		 * Click when in the attack phase.
+		 * @param territory selected territory
+		 */
 		private void attackClick(Territory territory) {
 			if (territory != null) {
 				// select attacker territory
@@ -258,7 +281,10 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			GameController.getInstance().setAttack(attackerTerritory , defenderTerritory);
 		}
 		
-		// Fortification Click
+		/**
+		 * Click when in the fortification phase.
+		 * @param territory selected territory
+		 */
 		private void fortificationClick(Territory territory) {
 			if (territory != null && currentPlayer.getTerritoryMap().containsValue(territory)) {
 				

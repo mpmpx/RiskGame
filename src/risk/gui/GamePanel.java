@@ -72,7 +72,7 @@ public class GamePanel extends JPanel {
 		return dominationView;
 	}
 	/**
-	 * Return the current card Exchane view
+	 * Return the current card exchange view
 	 * 
 	 * @return cardExchangeView
 	 */

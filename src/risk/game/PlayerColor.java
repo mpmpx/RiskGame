@@ -2,6 +2,11 @@ package risk.game;
 
 import java.awt.Color;
 
+
+/**
+ * PlayerColor class contains a set of colors to be used for representing players on the map.
+ *
+ */
 public class PlayerColor {
 
 	private static final int size = 6;
@@ -15,6 +20,11 @@ public class PlayerColor {
 													Color.lightGray
 												};
 	
+	
+	/**
+	 * Get next color in the list.
+	 * @return a color
+	 */
 	public static Color nextColor() {
 		if (index >= size) {
 			return null;
@@ -23,6 +33,9 @@ public class PlayerColor {
 		}
 	}
 	
+	/**
+	 * Reset the color list.
+	 */
 	public static void reset() {
 		index = 0;
 	}

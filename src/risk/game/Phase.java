@@ -20,6 +20,7 @@ public class Phase extends Observable {
 	
 	private Territory attacker;
 	private Territory defender;
+	
 	/**
 	 * Initialize the contents of the phase.
 	 */
@@ -73,6 +74,7 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
+	
 	/**
 	 * Method to add players.
 	 * 
@@ -80,6 +82,7 @@ public class Phase extends Observable {
 	public void addPlayers(Player[] players) {
 		this.players = players;
 	}
+	
 	/**
 	 * Method to get current phase when players in the game
 	 * 
@@ -88,6 +91,7 @@ public class Phase extends Observable {
 	public int getCurrentPhase() {
 		return currentPhase;
 	}
+	
 	/**
 	 * Method to get current players in the game
 	 * 
@@ -96,6 +100,7 @@ public class Phase extends Observable {
 	public Player getCurrentPlayer() {
 		return currentPlayer;
 	}
+	
 	/**
 	 * Method to get all players
 	 * 
@@ -104,6 +109,7 @@ public class Phase extends Observable {
 	public Player[] getPlayers() {
 		return players;
 	}
+	
 	/**
 	 * To set attack
 	 * 
@@ -118,6 +124,7 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
+	
 	/**
 	 * To set attacker
 	 * 
@@ -127,6 +134,7 @@ public class Phase extends Observable {
 	public void setAttacker(Territory attacker) {
 		this.attacker = attacker;
 	}
+	
 	/**
 	 * Method to get get attacker in this territory
 	 * 
@@ -135,6 +143,7 @@ public class Phase extends Observable {
 	public Territory getAttacker() {
 		return attacker;
 	}
+	
 	/**
 	 * To set defender
 	 * 
@@ -144,6 +153,7 @@ public class Phase extends Observable {
 	public void setDefender(Territory defender) {
 		this.defender = defender;
 	}
+	
 	/**
 	 * Method to get get defender in this territory
 	 * 
@@ -152,6 +162,7 @@ public class Phase extends Observable {
 	public Territory getDefender() {
 		return defender;
 	}
+	
 	/**
 	 * Method to add army in certain territory
 	 * @param territory
@@ -168,6 +179,7 @@ public class Phase extends Observable {
 			nextPhase();
 		}
 	}
+	
 	/**
 	 * Method to fortify army 
 	 * @param start
@@ -179,6 +191,7 @@ public class Phase extends Observable {
 		currentPlayer.removeArmy(start, army);
 		nextPhase();
 	}
+	
 	/**
 	 * Method to set the result of an attack
 	 * @param attackerCasulties
@@ -197,6 +210,7 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
+	
 	/**
 	 * Method to conquer a territory
 	 * @param army
@@ -244,8 +258,9 @@ public class Phase extends Observable {
 
 		checkAttackPhase();
 	}
+	
 	/**
-	 * Method to check whether it is an attackphase.
+	 * Method to check whether it is an attack phase.
 	 * @return true if the current phase is attack phase
 	 * 	and return false if it is not.
 	 */
@@ -265,6 +280,7 @@ public class Phase extends Observable {
 		
 		return true;
 	}
+	
 	/**
 	 * Method to exchange cards
 	 * @param cards
@@ -275,6 +291,7 @@ public class Phase extends Observable {
 		setChanged();
 		notifyObservers();
 	}
+	
 	/**
 	 * Method to exchange BonusArmy 
 	 * @param exchangeBonusArmy

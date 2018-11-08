@@ -19,6 +19,9 @@ import javax.swing.filechooser.FileSystemView;
 import risk.controller.GameController;
 import risk.controller.ReadFileController;
 
+/**
+ * Main frame that contains all panels and components.
+ */
 public class MainFrame extends JFrame{
 	public final static int WIDTH = 1000;
 	public final static int HEIGHT = 1000;
@@ -43,7 +46,6 @@ public class MainFrame extends JFrame{
 	}
 	/**
 	 * Constructor of MainFrame
-	 * 
 	 */
 	private MainFrame() {
 		setSize(WIDTH, HEIGHT);
@@ -62,6 +64,7 @@ public class MainFrame extends JFrame{
 		
 		setVisible(true);		
 	}
+	
 	/**
 	 * To get the game panel
 	 * 
@@ -70,6 +73,7 @@ public class MainFrame extends JFrame{
 	public GamePanel getGamePanel() {
 		return gamePanel;
 	}
+	
 	/**
 	 * Method to create a Meun Panel with a Jpanel
 	 * 
@@ -85,6 +89,7 @@ public class MainFrame extends JFrame{
 		startButton.addActionListener(new ButtonListener());
 		menuPanel.add(startButton, c);
 	}
+	
 	/**
 	 * Method to implement a button listener
 	 * 

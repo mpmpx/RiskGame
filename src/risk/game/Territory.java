@@ -42,6 +42,7 @@ public class Territory {
 		this.location = location;
 		army = 0;
 	}
+	
 	/**
 	 * To set the territory's name.
 	 * 
@@ -51,6 +52,7 @@ public class Territory {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	/**
 	 * To get a territory's name.
 	 * 
@@ -59,6 +61,7 @@ public class Territory {
 	public String getName() {
 		return name;
 	}
+	
 	/**
 	 * To set the continent's name.
 	 * 
@@ -68,6 +71,7 @@ public class Territory {
 	public void setContinentName(String continentName) {
 		this.continentName = continentName;
 	}
+	
 	/**
 	 * To get a continent's name.
 	 * 
@@ -76,6 +80,7 @@ public class Territory {
 	public String getContinentName() {
 		return continentName;
 	}
+	
 	/**
 	 * To set the location's point.
 	 * 
@@ -85,6 +90,7 @@ public class Territory {
 	public void setLocation(Point location) {
 		this.location = location;
 	}
+	
 	/**
 	 * To set the location's point.
 	 * 
@@ -94,6 +100,7 @@ public class Territory {
 	public void setLocation(int x, int y) {
 		location = new Point(x, y);
 	}
+	
 	/**
 	 * To get a location's point.
 	 * 
@@ -102,22 +109,25 @@ public class Territory {
 	public Point getLocation() {
 		return location;
 	}
+	
 	/**
 	 * To get a location's x value.
 	 * 
-	 * @return the x in int.
+	 * @return the x coordinate.
 	 */
 	public int getX() {
 		return location.x;
 	}
+	
 	/**
 	 * To get a location's y value.
 	 * 
-	 * @return the y in int.
+	 * @return the y coordinate.
 	 */
 	public int getY() {
 		return location.y;
 	}
+	
 	/**
 	 * To set the owner
 	 * 
@@ -127,6 +137,7 @@ public class Territory {
 	public void setOwner(Color owner) {
 		this.owner = owner;
 	}
+	
 	/**
 	 * To get a the owner according Color object .
 	 * 
@@ -135,6 +146,7 @@ public class Territory {
 	public Color getOwner() {
 		return owner;
 	}
+	
 	/**
 	 * To set the Army
 	 * 
@@ -144,6 +156,7 @@ public class Territory {
 	public void setArmy(int army) {
 		this.army = army;
 	}
+	
 	/**
 	 * To get Army.
 	 * 
@@ -152,6 +165,7 @@ public class Territory {
 	public int getArmy() {
 		return army;
 	}
+	
 	/**
 	 * To add the additional Army
 	 * 
@@ -161,6 +175,7 @@ public class Territory {
 	public void addArmy(int army) {
 		this.army += army;
 	}
+	
 	/**
 	 * To remove the Army
 	 * 
@@ -170,15 +185,17 @@ public class Territory {
 	public void removeArmy(int army) {
 		this.army -= army;
 	}
+	
 	/**
 	 * To set the Shape
 	 * 
 	 * @param shape
-	 *            set set with linkedlist type
+	 *            set set with linked list type
 	 */
 	public void setShape(LinkedList<Point> shape) {
 		this.shape = shape;
 	}
+	
 	/**
 	 * To get Shape.
 	 * 
@@ -187,6 +204,7 @@ public class Territory {
 	public LinkedList<Point> getShape() {
 		return shape;
 	}
+	
 	/**
 	 * To check if the location has shape
 	 * 
