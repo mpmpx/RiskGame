@@ -21,7 +21,9 @@ public class GUIController {
 		
 		return controller;
 	}
-	
+	/**
+	 * Constructor Method
+	 */
 	private GUIController() {
 		mainFrame = MainFrame.getInstance();
 	}
