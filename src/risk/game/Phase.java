@@ -270,7 +270,6 @@ public class Phase extends Observable {
 	 * @param cards
 	 */
 	public void exchangeCards(LinkedList<Integer> cards) {
-		//currentPlayer.getCardSet().removeCards(cards);
 		currentPlayer.addExchangeBonusArmy(exchangeBonusArmy);
 		exchangeBonusArmy += 5;
 		setChanged();

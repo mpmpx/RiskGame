@@ -183,8 +183,6 @@ public class Player{
 			totalArmy++;
 			RiskMap.getInstance().updateTerritory(territory);
 		}
-		
-		//unassignedArmy -= ownedTerritoryNum;
 	}
 	/**
 	 * To get the player's name
