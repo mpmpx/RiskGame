@@ -5,7 +5,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import risk.game.*;
-
+/**
+ * Class acting as the Game's controller, 
+ * to define action performed according to different users' action.
+ */
 public class GameController {
 
 	private static GameController controller;
