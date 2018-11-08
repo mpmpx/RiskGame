@@ -5,7 +5,11 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({JUnitTest1.class})
+//@SuiteClasses({readFileTest.class,GameControllerTest.class})
+@SuiteClasses({readFileTest.class,
+				validateContinentTest.class,
+				validateConnectedGraphTest.class,
+				validateTerritoryTest.class})
 
 public class JunitTestSuite {   
 }  
