@@ -29,7 +29,11 @@ public class MainFrame extends JFrame{
 	private JPanel menuPanel;
 	private GamePanel gamePanel;
 	private JPanel contentPanel;
-	
+	/**
+	 * To get the instance of the main frame
+	 * 
+	 * @return the frame
+	 */
 	public static MainFrame getInstance() {
 		if (mainFrame == null) {
 			mainFrame = new MainFrame();
@@ -37,7 +41,10 @@ public class MainFrame extends JFrame{
 		
 		return mainFrame;
 	}
-	
+	/**
+	 * Constructor of MainFrame
+	 * 
+	 */
 	private MainFrame() {
 		setSize(WIDTH, HEIGHT);
 		setResizable(false);
@@ -55,11 +62,18 @@ public class MainFrame extends JFrame{
 		
 		setVisible(true);		
 	}
-	
+	/**
+	 * To get the game panel
+	 * 
+	 * @return the panel 
+	 */
 	public GamePanel getGamePanel() {
 		return gamePanel;
 	}
-	
+	/**
+	 * Method to create a Meun Panel with a Jpanel
+	 * 
+	 */
 	private void createMenuPanel() {
 		menuPanel = new JPanel();
 
@@ -71,7 +85,10 @@ public class MainFrame extends JFrame{
 		startButton.addActionListener(new ButtonListener());
 		menuPanel.add(startButton, c);
 	}
-	
+	/**
+	 * Method to implement a button listener
+	 * 
+	 */
 	private class ButtonListener implements ActionListener {
 
 		@Override
@@ -106,7 +123,11 @@ public class MainFrame extends JFrame{
 			}
 		}
 		
-		
+		/**
+		 * Method to set up the map file
+		 * 
+		 * @throws IOException
+		 */
 		private void setMap() throws Exception{
 			JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 			fileChooser.setDialogTitle("Select a map file");
