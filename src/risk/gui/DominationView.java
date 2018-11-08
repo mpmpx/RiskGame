@@ -15,23 +15,37 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 
 import risk.game.*;
-
+/**
+ * This class is the GUI for the Domination View Panel
+ */
 public class DominationView extends JPanel implements Observer{
 
 	Player[] players;
 	LinkedList<JTextArea> textAreaList;
-	
+	/**
+	 * Constructor method
+	 * 
+	 */
 	public DominationView() {
 		players = new Player[6];
 		textAreaList = new LinkedList<JTextArea>();
 	}
-	
+	/**
+	 * Initialization method
+	 * 
+	 */
 	public void initialize() {
 		BufferedImage image = RiskMap.getInstance().getImage();
 		setPreferredSize(new Dimension(200, 750));
 		setLayout(new GridLayout(6, 1));
 	}
-	
+	/**
+	 * Method to update the domination view
+	 * @param obs
+	 *            obs with Oberservale type
+	 * @param arg1
+	 *            arg1 with Object type
+	 */
 	@Override
 	public void update(Observable obs, Object object) {
 		players = ((Phase) obs).getPlayers();
@@ -63,7 +77,9 @@ public class DominationView extends JPanel implements Observer{
 		
 		updateView();
 	}
-	
+	/**
+	 * Method to update the domination view
+	 */
 	private void updateView() {
 		removeAll();
 		revalidate();
