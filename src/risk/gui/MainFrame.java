@@ -1,19 +1,25 @@
 package risk.gui;
 
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
@@ -24,7 +30,7 @@ import risk.game.RiskMap;
 /**
  * Main frame that contains all panels and components.
  */
-public class MainFrame extends JFrame implements ActionListener{
+public class MainFrame extends JFrame {
 	public final static int WIDTH = 1000;
 	public final static int HEIGHT = 1000;
 	public final static String MENU_PANEL = "Menu Panel";
@@ -36,6 +42,12 @@ public class MainFrame extends JFrame implements ActionListener{
 	
 	private Game module;
 	private JButton startButton;
+	
+	private final String[] playerBehaviour = {"None", "Human", "Aggressive", "Benevolent", "Random", "Cheater"};
+	private JTextField mapFilePath;
+	private JComboBox[] playersBox;
+	
+	private File selectedFile;
 	
 	/**
 	 * Gets the instance of the MainFrame.
@@ -65,6 +77,14 @@ public class MainFrame extends JFrame implements ActionListener{
 		
 		((CardLayout) contentPanel.getLayout()).show(contentPanel,  MENU_PANEL);
 		setVisible(true);
+		
+		mapFilePath = new JTextField();
+		mapFilePath.setEditable(false);
+		mapFilePath.setPreferredSize(new Dimension(100,20));
+		playersBox = new JComboBox[6];
+		for (int i = 0; i < 6; i++) {
+			playersBox[i] = new JComboBox(playerBehaviour);
+		}
 	}
 	
 	/**
@@ -77,10 +97,11 @@ public class MainFrame extends JFrame implements ActionListener{
 		GridBagConstraints c = new GridBagConstraints();
 		
 		startButton = new JButton("Start");
-		startButton.addActionListener(this);
+		startButton.addActionListener(new StartListener());
 		menuPanel.add(startButton, c);
 		panels.put(MENU_PANEL, menuPanel);
 		addPanel(menuPanel, MENU_PANEL);
+
 	}
 	
 	/**
@@ -109,40 +130,6 @@ public class MainFrame extends JFrame implements ActionListener{
 		this.module = module;
 	}
 	
-
-	/**
-	 * Methods of the start button's action listener.
-	 */
-	@Override
-	public void actionPerformed(ActionEvent e) {
-
-		JSlider slider = new JSlider(2, 6);
-		slider.setMajorTickSpacing(1);
-		slider.setPaintTicks(true);
-		slider.setPaintLabels(true);
-		Object[] message = { "Set the number of players (2 - 6)", slider };
-
-		int playerDialogResult = JOptionPane.showConfirmDialog(null, message, "Setup", JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
-
-		if (playerDialogResult == JOptionPane.OK_OPTION) {
-			try {
-				loadMap();
-			} catch (Exception exception) {
-				JOptionPane.showMessageDialog(null, exception.getMessage());
-				return;
-			}
-
-			module.setPlayers(slider.getValue());
-			module.distributeTerritories();
-			((GamePanel) panels.get(GAME_PANEL)).initialize();
-			module.start();
-			((CardLayout) contentPanel.getLayout()).show(contentPanel, GAME_PANEL);
-		} else {
-			return;
-		}
-	}
-
 	/**
 	 * Reads map file and store data into a RiskMap, then sets the map to the module.
 	 * @throws IOException if map is invalid.
@@ -167,5 +154,84 @@ public class MainFrame extends JFrame implements ActionListener{
 
 		module.setMap(map);
 	}
+	
+	/**
+	 * Methods of the start button's action listener.
+	 */
+	private class StartListener implements ActionListener {
+		RiskMap map;
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JButton loadMapButton = new JButton("Load Map");
+			loadMapButton.addActionListener(new LoadMapListener());
 
+			Object[] message = { loadMapButton, mapFilePath, 
+					"player1", playersBox[0], 
+					"player2", playersBox[1],
+					"player3", playersBox[2],
+					"player4", playersBox[3],
+					"player5", playersBox[4],
+					"player6", playersBox[5] };
+
+			int playerDialogResult = JOptionPane.showConfirmDialog(null, message, "Setup", JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE);
+			
+			if (playerDialogResult == JOptionPane.OK_OPTION) {
+				LinkedList<String> behaviours = new LinkedList<String>();
+				for (int i = 0; i < 6; i++) {
+					if ((String)playersBox[i].getSelectedItem() != "None") {
+						behaviours.add((String)playersBox[i].getSelectedItem());
+					}
+				}
+				
+				if (behaviours.size() < 2 || mapFilePath.getText().length() == 0) {
+					JOptionPane.showMessageDialog(null, "Please select a map and more than 2 players.");
+					return;
+				}
+				ReadFileController readFileController = new ReadFileController();
+				try {
+					map = readFileController.readFile(selectedFile.getAbsolutePath());
+				} catch (Exception exception) {
+					JOptionPane.showMessageDialog(null, exception.getMessage());
+					return;
+				}
+				module.setMap(map);
+				module.setPlayers(behaviours);
+				module.distributeTerritories();
+				((GamePanel) panels.get(GAME_PANEL)).initialize();
+				module.start();
+				((CardLayout) contentPanel.getLayout()).show(contentPanel, GAME_PANEL);
+				
+			} 
+			
+			mapFilePath.setText(null);
+			for (int i = 0; i < 6; i++) {
+				playersBox[i].setSelectedIndex(0);
+			}
+		}
+	}
+
+	/**
+	 * Customized ActionListener for "Load Map" button.
+	 */
+	private class LoadMapListener implements ActionListener {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+			fileChooser.setDialogTitle("Select a map file");
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Map file", "map");
+			fileChooser.addChoosableFileFilter(filter);
+
+			int returnValue = fileChooser.showOpenDialog(null);
+
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				selectedFile = fileChooser.getSelectedFile();
+				mapFilePath.setText(selectedFile.getPath());
+			}
+
+		}
+	}
 }
