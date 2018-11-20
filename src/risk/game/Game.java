@@ -25,6 +25,7 @@ public class Game extends Observable{
 	private PriorityQueue<Integer> defenderDice;
 	private Territory attacker;
 	private Territory defender;
+	private Player winner;
 	
 	/**
 	 * Creates a game with initial exchange bonus armies with 5.
@@ -42,8 +43,8 @@ public class Game extends Observable{
 	 * @param playerNum an integer that is to be set as number
 	 * of players of this game.
 	 */
-	public void setPlayers (int playerNum) {
-		this.playerNum = playerNum;
+	public void setPlayers (LinkedList<String> behaviours) {
+		playerNum = behaviours.size();
 		players = new Player[playerNum];
 		for (int i = 0; i < playerNum; i++) {
 			players[i] = new Player("player" + (i + 1));
@@ -83,6 +84,10 @@ public class Game extends Observable{
 	 */
 	public RiskMap getMap() {
 		return map;
+	}
+	
+	public Player getWinner() {
+		return winner;
 	}
 	
 	/**
@@ -146,6 +151,8 @@ public class Game extends Observable{
 	 * Proceeds game to next phase.
 	 */
 	public void nextPhase() {
+		int currentPhase = phase.getCurrentPhase();
+		
 		switch (phase.getCurrentPhase()) {
 			case Phase.STARTUP : {
 				if (currentPlayer == players[playerNum - 1]) {
@@ -325,6 +332,10 @@ public class Game extends Observable{
 		
 		setChanged();
 		notifyObservers();
+		
+		if (players.length == 1) {
+			winner = currentPlayer;
+		}
 	}
 	
 	/**
