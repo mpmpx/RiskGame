@@ -2,9 +2,9 @@ package risk.game;
 
 import java.util.LinkedList;
 import java.util.Random;
+
 /**
- * This class defines the Cards that player can exchange to troops
- *
+ * This class defines the hand cards of a player.
  */
 public class Cards {
 
@@ -22,8 +22,7 @@ public class Cards {
 	}
 	
 	/**
-	 * method to add card 
-	 * 
+	 * method to add card.
 	 * @param value of the card
 	 */
 	public void addCard(int value) {
@@ -31,9 +30,7 @@ public class Cards {
 	}
 	
 	/**
-	 * If player conquered at least one territory during the attack phase, he
-	 * will be given a card
-	 * 
+	 * Randomly gets a card from three kinds of cards.
 	 */
 	public void getCard() {
 		Random r = new Random();
@@ -41,26 +38,24 @@ public class Cards {
 	}
 	
 	/**
-	 * To get the hand card
-	 * 
-	 * @return the hand card with int type with a linked list 
+	 * Gets all cards.
+	 * @return all cards. 
 	 */
 	public LinkedList<Integer> getAllCards() {
 		return cards;
 	}
 	
 	/**
-	 * To get the size of the hand card
-	 * 
-	 * @return the size of the hand card with int type
+	 * Gets number of cards
+	 * @return number of cards.
 	 */
 	public int getSize() {
 		return cards.size();
 	}
 	
 	/**
-	 * method to remove cards
-	 * @param cards
+	 * Removes some cards from all cards.
+	 * @param cards cards to be removed from all cards.
 	 */
 	public void removeCards(LinkedList<Integer> cards) {
 		for (Integer card : cards) {

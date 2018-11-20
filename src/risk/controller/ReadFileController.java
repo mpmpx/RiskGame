@@ -15,15 +15,17 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 
 import risk.game.*;
+
 /**
- * Class acting as the ReadFile's controller, in order to access different needed files. 
- * 
+ * ReadFileController is responsible for reading map files. Additionally check format of the file
+ * and make map validation.
  */
 public class ReadFileController {
 
 	private HashMap<String, Continent> continentMap;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<String, LinkedList<String>> edgeMap;
+	private String imagePath;
 	private BufferedImage image;
 	private String label;
 	
@@ -44,7 +46,7 @@ public class ReadFileController {
 	}
 	
 	/**
-	 * Method to check name
+	 * Check whether necessary blocks are in the map file.
 	 * @throws IOException if the block name is invalid
 	 */
     private void validateBlockName() throws Exception  {
@@ -74,7 +76,7 @@ public class ReadFileController {
     	for (Territory territory : territoryMap.values()) {
     		found = false;
     		for (Continent continent : continentMap.values()) {
-    			if (continent.getName().equals(territory.getContinentName())) {
+    			if (continent.getName().equals(territory.getContinentName())){
     				found = true;
     			}
     		}
@@ -86,7 +88,58 @@ public class ReadFileController {
     }
 
     /**
-     * Method to validate every territory and their adjacent countries.
+     * Check whether all continents are subgraph.
+     * @throws Exception if one of continents is not subgraph.
+     */
+    private void validateConnectedContinent() throws Exception {
+    	HashMap<String, HashMap<String, Territory>> tmpContinentMap = new HashMap<String, HashMap<String, Territory>>();
+
+    	for (Continent continent : continentMap.values()) {
+    		tmpContinentMap.put(continent.getName(), new HashMap<String, Territory>());
+    	}
+    	
+    	for (Territory territory : territoryMap.values()) {
+    		tmpContinentMap.get(territory.getContinentName()).put(territory.getName(), territory);
+    	}
+    	
+    	for (String continentName : tmpContinentMap.keySet()) {
+    		HashMap<String, Territory> tmpTerritoryMap = tmpContinentMap.get(continentName);
+        	String firstTerritory = null;
+        	for (String name : tmpTerritoryMap.keySet()) {
+        		firstTerritory = name;
+        		break;
+        	}
+        	
+        	HashMap<String, Boolean> visited = new HashMap<String, Boolean>();
+        	for (Territory territory : tmpTerritoryMap.values()) {
+        		visited.put(territory.getName(), false);
+        	}
+      
+        	Stack<String> stack = new Stack<String>();
+        	stack.push(firstTerritory);
+        	
+        	while (!stack.isEmpty()) {
+        		String currentTerritory = stack.pop();
+        		if (visited.containsKey(currentTerritory)) {	
+        			if (visited.get(currentTerritory) == false) {
+        				visited.replace(currentTerritory, true);
+        				for (String adjacentTerritory : edgeMap.get(currentTerritory)) {
+        					stack.push(adjacentTerritory);
+        				}
+        			}
+        		}
+        	}
+        	    	
+        	for (Boolean status : visited.values()) {
+        		if (status == false) {
+    				throw new Exception(continentName + " is not a connected subgraph");
+        		}
+        	}
+    	}
+    }
+    
+    /**
+     * This Method is used to validate every territory and their adjacent countries.
      * @throws IOException if a territory's adjacent territory is not valid or a territory's adjacent
      * territory does not links to itself.
      */
@@ -113,7 +166,7 @@ public class ReadFileController {
     }
     
     /**
-     * Check whether the map read from the file is a connected graph.
+     * Check whether the map is a connected graph.
      * @throws IOException if the the map read from the file is not a connected graph.
      */
     private void validateConnectedGraph() throws Exception {
@@ -147,9 +200,10 @@ public class ReadFileController {
     		}
     	}
     }
+    
     /**
-     * Method to get territory shape
-     * @param territory
+     * Get shape of the given territory.
+     * @param territory get shape of this territory.
      */
     private LinkedList<Point> getTerritoryShape(Territory territory) {
     	LinkedList<Point> shape = new LinkedList<Point>();
@@ -197,9 +251,8 @@ public class ReadFileController {
      * @return an instance of RiskMap.
      * @throws IOException if encounters IO error.
      */	
-    public void readFile(String pathName) throws Exception {
-    	RiskMap map = RiskMap.getInstance();
-    	map.clear();
+    public RiskMap readFile(String pathName) throws Exception {
+    	RiskMap map = new RiskMap();
     
     	File file = new File(pathName);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
@@ -216,9 +269,11 @@ public class ReadFileController {
                     case "[Map]": {
                     	String[] token = line.split("=");
                     	if (token[0].equals("image")) {
+                			imagePath = new File(file.getParent(), token[1]).getPath();
                     		try {
-								image = ImageIO.read(new File(new File(file.getParent(), token[1]).getPath()));
-							} catch (Exception e) {
+								image = ImageIO.read(new File(imagePath));
+							
+                    		} catch (Exception e) {
 								e.printStackTrace();
 							}
                     		
@@ -274,7 +329,7 @@ public class ReadFileController {
         validateContinent();
         validateTerritory();
         validateConnectedGraph();
-        
+    	validateConnectedContinent();
         
         for (Territory territory : territoryMap.values()) {
         	continentMap.get(territory.getContinentName()).addTerritory(territory);
@@ -286,5 +341,7 @@ public class ReadFileController {
         }
         
         map.addLink(edgeMap);
+        
+        return map;
     }
 }

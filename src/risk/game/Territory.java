@@ -5,35 +5,30 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 /**
- * This class handle territory linked relationship, and manage to set and get
- * territories names.
+ * This class represents a territory and maintains status and data including name, color, owner,
+ * location, number of armies, shape and territory it belongs to.
  */
 public class Territory {
 
 	private String name;
+	private Player owner;
 	private String continentName;
 	private Point location;
-	private Color owner;
+	private Color ownerColor;
 	private int army;
 	private LinkedList<Point> shape;
 	
 	/**
-	 * constructor method.
+	 * Creates a territory.
 	 */
 	public Territory() {
 		shape = new LinkedList<Point>();
-		name = null;
-		continentName = null;
-		location = null;
-		owner = null;
 		army = 0;
 	}
 	/**
-	 * constructor method.
-	 * @param name
-	 *		the point of the location
-	 * @param location
-	 *		the name in String type
+	 * Creates a territory with a name and location coordinates
+	 * @param name a string that is to be name of the territory.
+	 * @param location a point that is to be the location of this territory.
 	 */
 	
 	public Territory(String name, Point location) {
@@ -44,171 +39,162 @@ public class Territory {
 	}
 	
 	/**
-	 * To set the territory's name.
-	 * 
-	 * @param name
-	 *            the name that is wanted to input.
+	 * Sets the name of the territory.
+	 * @param name a string that is to be name of the territory.
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
 	/**
-	 * To get a territory's name.
-	 * 
-	 * @return the territory's name.
+	 * Returns the name of the territory.
+	 * @return name of the territory.
 	 */
 	public String getName() {
 		return name;
 	}
 	
 	/**
-	 * To set the continent's name.
-	 * 
-	 * @param continentName
-	 *            the name that is wanted to input.
+	 * Sets the owner of this territory.
+	 * @param player a player that is to be the owner of this territory.
+	 */
+	public void setOwner(Player player) {
+		this.owner = player;
+	}
+	
+	/**
+	 * Returns the owner of this territory.
+	 * @return the owner of this territory.
+	 */
+	public Player getOwner() {
+		return owner;
+	}
+	
+	/**
+	 * Sets name of the continent of this territory.
+	 * @param continentName a string that is to be name of the continent of the territory.
 	 */
 	public void setContinentName(String continentName) {
 		this.continentName = continentName;
 	}
 	
 	/**
-	 * To get a continent's name.
-	 * 
-	 * @return the continent's name.
+	 * Returns the name of the continent of the territory.
+	 * @return name of the continent of the territory.
 	 */
 	public String getContinentName() {
 		return continentName;
 	}
 	
 	/**
-	 * To set the location's point.
-	 * 
-	 * @param location
-	 *            the point that is located.
+	 * Sets the location of this territory with a point.
+	 * @param location a point. The new location of the territory.
 	 */
 	public void setLocation(Point location) {
 		this.location = location;
 	}
 	
 	/**
-	 * To set the location's point.
-	 * 
-	 * @param x,y
-	 *            the new point that is located in type Int.
+	 * Sets the location of this territory with x and y coordinates.
+	 * @param x x coordinate of the new location.
+	 * @param y y coordinate of the new location.
 	 */
 	public void setLocation(int x, int y) {
 		location = new Point(x, y);
 	}
 	
 	/**
-	 * To get a location's point.
-	 * 
-	 * @return the location.
+	 * Returns the location of this territory.
+	 * @return the location of this territory.
 	 */
 	public Point getLocation() {
 		return location;
 	}
 	
 	/**
-	 * To get a location's x value.
-	 * 
-	 * @return the x coordinate.
+	 * Returns x coordinate of the location of this territory.
+	 * @return x coordinate of the location of this territory.
 	 */
 	public int getX() {
 		return location.x;
 	}
 	
 	/**
-	 * To get a location's y value.
-	 * 
-	 * @return the y coordinate.
+	 * Returns y coordinate of the location of this territory.
+	 * @return y coordinate of the location of this territory.
 	 */
 	public int getY() {
 		return location.y;
 	}
 	
 	/**
-	 * To set the owner
-	 * 
-	 * @param owner
-	 *            set the owner using type color
+	 * Sets color of this territory.
+	 * @param ownerColor a color that is to be the color of this territory.
 	 */
-	public void setOwner(Color owner) {
-		this.owner = owner;
+	public void setColor(Color ownerColor) {
+		this.ownerColor = ownerColor;
 	}
 	
 	/**
-	 * To get a the owner according Color object .
-	 * 
-	 * @return the owner .
+	 * Returns color of this territory.
+	 * @return color of this territory.
 	 */
-	public Color getOwner() {
-		return owner;
+	public Color getColor() {
+		return ownerColor;
 	}
 	
 	/**
-	 * To set the Army
-	 * 
-	 * @param army
-	 *            set the owner with type int
+	 * Sets number of armies of this territory.
+	 * @param armyNum an integer that is to be number of armies of this territory.
 	 */
-	public void setArmy(int army) {
-		this.army = army;
+	public void setArmy(int armyNum) {
+		this.army = armyNum;
 	}
 	
 	/**
-	 * To get Army.
-	 * 
-	 * @return the army .
+	 * Returns number of armies of this territory.
+	 * @return number of armies of this territory.
 	 */
 	public int getArmy() {
 		return army;
 	}
 	
 	/**
-	 * To add the additional Army
-	 * 
-	 * @param army
-	 *            add additional army with int type
+	 * Adds armies to this territory.
+	 * @param army an integer that is the number of armies to be added to this territory.
 	 */
 	public void addArmy(int army) {
 		this.army += army;
 	}
 	
 	/**
-	 * To remove the Army
-	 * 
-	 * @param army
-	 *            remove army with int type
+	 * Removes armies from this territory.
+	 * @param army an integer that is the number of armies to be removed from this territory.
 	 */
 	public void removeArmy(int army) {
 		this.army -= army;
 	}
 	
 	/**
-	 * To set the Shape
-	 * 
-	 * @param shape
-	 *            set set with linked list type
+	 * Sets shape of this territory.
+	 * @param shape a list of all x-y coordinates in this territory.
 	 */
 	public void setShape(LinkedList<Point> shape) {
 		this.shape = shape;
 	}
 	
 	/**
-	 * To get Shape.
-	 * 
-	 * @return the shape .
+	 * Returns shape of this territory.
+	 * @return list of all x-y coordinates in this territory.
 	 */
 	public LinkedList<Point> getShape() {
 		return shape;
 	}
 	
 	/**
-	 * To check if the location has shape
-	 * 
-	 * @return shape.contains(location)
+	 * Checks whether the given location is in this territory.
+	 * @param location a point that is used for checking.
+	 * @return true if the given location is in the territory. Otherwise, false.
 	 */
 	public boolean contains(Point location) {
 		return shape.contains(location);
