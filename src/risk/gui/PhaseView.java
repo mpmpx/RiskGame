@@ -6,11 +6,10 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,8 +22,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import java.awt.CardLayout;
+
 import risk.game.*;
-import risk.controller.*;
 /**
  * This class is the GUI for the Phase View Panel, showing the current phase of
  * conquest game and current player
@@ -32,6 +32,10 @@ import risk.controller.*;
 public class PhaseView extends JPanel implements Observer{
 
 	private int currentPhase;
+	private Game module;
+	private Territory attacker;
+	private Territory defender;
+	
 	private CardExchangeView cardExchangeView;
 	private JButton nextButton;
 	private Player currentPlayer;
@@ -44,11 +48,7 @@ public class PhaseView extends JPanel implements Observer{
 	private JSpinner defenderSpinner;
 	private JLabel attackerDiceLabel;
 	private JLabel defenderDiceLabel;
-	
-	JDialog exchangeDialog;
-	
-	private Territory attacker;
-	private Territory defender;
+	private JDialog exchangeDialog;
 	
 	/**
 	 * constructor method initialize phase view panel
@@ -57,7 +57,6 @@ public class PhaseView extends JPanel implements Observer{
 	public PhaseView() {
 		setLayout(new GridBagLayout());
 		
-		cardExchangeView = new CardExchangeView();
 		nextButton = new JButton("Next");
 		remainingArmyLabel = new JLabel();
 		reinforcementInfo = new JLabel();
@@ -74,17 +73,17 @@ public class PhaseView extends JPanel implements Observer{
 		
 		setPreferredSize(new Dimension(MainFrame.WIDTH, 200));
 		nextButton.addActionListener(new ButtonListener());
-
-
-		
 	}
-	/**
-	 * Method to initialize
-	 */
-	public void initialize() {
-		exchangeDialog = new JDialog(MainFrame.getInstance(), "Card Exchange", true);
 
+	/**
+	 * Initializes this PhaseView with module.
+	 * @param module a Game that is to be the module of this PhaseView panel.
+	 */
+	public void initialize(Game module) {
+		this.module = module;
+		module.addObserver(this);
 		
+		exchangeDialog = new JDialog(MainFrame.getInstance(), "Card Exchange", true);	
 		exchangeDialog.setPreferredSize(new Dimension(600, 300));
 		exchangeDialog.setLocationRelativeTo(null);
 		exchangeDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -93,21 +92,27 @@ public class PhaseView extends JPanel implements Observer{
 		exchangeDialog.pack();
 	}
 	
+	/**
+	 * Sets the CardExchangeView of the PhaseView panel.
+	 * @param cardExchangeView a cardExchangeView that is to be set.
+	 */
 	public void setCardExchangeView(CardExchangeView cardExchangeView) {
 		this.cardExchangeView = cardExchangeView;
 
 	}
 	/**
 	 * Method to update the phase view
-	 * @param Observable observable class
-	 * @param Object argument.
+	 * @param observable observable class
+	 * @param arg argument.
 	 */
 	@Override
-	public void update(Observable obs, Object arg) {
-		currentPhase = ((Phase) obs).getCurrentPhase();
-		currentPlayer = ((Phase) obs).getCurrentPlayer();
-		attacker = ((Phase) obs).getAttacker();
-		defender = ((Phase) obs).getDefender();
+	public void update(Observable observable, Object arg) {
+		Game obs = (Game) observable;
+		
+		currentPhase = obs.getCurrentPhase();
+		currentPlayer = obs.getCurrentPlayer();
+		attacker = obs.getAttacker();
+		defender = obs.getDefender();
 
 		if (attacker != null) {
 			attackerLabel.setText("attacker: " + attacker.getName());
@@ -187,7 +192,7 @@ public class PhaseView extends JPanel implements Observer{
 		Border colorBorder = BorderFactory.createLineBorder(currentPlayer.getColor(), 10);
 
 		JButton exchangeButton = new JButton("Exchange Cards");
-		LinkedList<Continent> controlledContinent = currentPlayer.getControlledContinent();
+		HashMap<Continent, Boolean> controlledContinent = currentPlayer.getControlledContinent();
 		Border titleBorder = BorderFactory.createTitledBorder(colorBorder, currentPlayer.getName() +
 				" - Reinforcement Phase", TitledBorder.CENTER, TitledBorder.TOP);
 		setBorder(titleBorder);
@@ -204,8 +209,10 @@ public class PhaseView extends JPanel implements Observer{
 		remainingArmyLabel.setText("Remaining unassgined armies: " + currentPlayer.getUnassignedArmy());
 
 		String reinforcementInfoMsg = "Free armies: " + currentPlayer.getFreeArmy() + " ";
-		for (Continent continent : controlledContinent) {
-			reinforcementInfoMsg += "Own " + continent.getName() + ": " + continent.getValue() + " ";
+		for (Continent continent : controlledContinent.keySet()) {
+			if (controlledContinent.get(continent)) {
+				reinforcementInfoMsg += "Own " + continent.getName() + ": " + continent.getValue() + " ";
+			}
 		}
 		reinforcementInfo.setText(reinforcementInfoMsg);
 		
@@ -228,9 +235,7 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridy = 2;
 		add(nextButton, c);
 		
-		if (currentPlayer.getCardSet().getSize() >= 5 && !exchangeDialog.isVisible()) {
-			exchangeDialog.setVisible(true);
-		}
+
 	}
 	/**
 	 * Method to update the attack phase view
@@ -250,6 +255,41 @@ public class PhaseView extends JPanel implements Observer{
 		alloutButton.addActionListener(new AttackPhaseButtonListener());
 		stopButton.addActionListener(new AttackPhaseButtonListener());
 		
+		String attackerDiceResult = "<html>";
+		String defenderDiceResult = "<html>";
+		
+		PriorityQueue<Integer> attackerDice = new PriorityQueue<Integer>(Collections.reverseOrder());
+		attackerDice.addAll(module.getAttackerDice());
+		PriorityQueue<Integer> defenderDice = new PriorityQueue<Integer>(Collections.reverseOrder());
+		defenderDice.addAll(module.getDefenderDice());
+		
+		while (!attackerDice.isEmpty() && !defenderDice.isEmpty()) {
+			if (attackerDice.peek() > defenderDice.peek()) {
+				attackerDiceResult += ("<font color='red'>"+ attackerDice.peek().toString()+ "</font>   ");
+				defenderDiceResult += defenderDice.peek() + "   ";
+			} 
+			else {
+				defenderDiceResult += ("<font color='red'>"+ defenderDice.peek().toString()+ "</font>   ");
+				attackerDiceResult += attackerDice.peek() + "   ";
+			}
+			attackerDice.remove();
+			defenderDice.remove();
+		}
+		
+		while (!attackerDice.isEmpty()) {
+			attackerDiceResult += attackerDice.remove() + "   ";
+		}
+		attackerDiceResult += "</html>";
+		
+		while (!defenderDice.isEmpty()) {
+			defenderDiceResult += defenderDice.remove() + "   ";
+		}
+		defenderDiceResult += "</html>";
+		
+		attackerDiceLabel.setText(attackerDiceResult);
+		defenderDiceLabel.setText(defenderDiceResult);
+		
+		
 		if (attacker != null && defender != null) {
 			
 			if (attacker.getArmy() == 1) {
@@ -259,8 +299,9 @@ public class PhaseView extends JPanel implements Observer{
 				rollButton.setEnabled(false);
 				alloutButton.setEnabled(false);
 				stopButton.setEnabled(false);
-				GameController.getInstance().setAttack(null,  null);
-				if (GameController.getInstance().checkAttackPhase() == false) {
+				module.setupAttack(null,  null);
+				
+				if (module.checkAttackPhase() == false) {
 					attackerDiceLabel.setText(null);
 					defenderDiceLabel.setText(null);
 					return;
@@ -350,7 +391,7 @@ public class PhaseView extends JPanel implements Observer{
 		add(nextButton, c);
 	}
 	/**
-	 * Method to update the fortication phase view
+	 * Method to update the fortification phase view
 	 */
 	private void updateFortificationPhaseView() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -377,91 +418,8 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridy = 1;
 		add(nextButton, c);		
 	}
-	/**
-	 * Method for attacker and defender to roll the random dice
-	 */
-	private void rollDice(int attackerDiceNum, int defenderDiceNum) {
-		int attackerCasulties = 0;
-		int defenderCasulties = 0;
-		
-		Random dice = new Random();
-		PriorityQueue<Integer> attackerDice = new PriorityQueue<Integer>(3, Collections.reverseOrder());
-		PriorityQueue<Integer> defenderDice = new PriorityQueue<Integer>(2, Collections.reverseOrder());
-				
-		for (int i = 0; i < attackerDiceNum; i++) {
-			attackerDice.add(dice.nextInt(6) + 1);
-		}
-		
-		for (int i = 0; i < defenderDiceNum; i++) {
-			defenderDice.add(dice.nextInt(6) + 1);
-		}
-		
-		String attackerDiceResult = "<html>";
-		String defenderDiceResult = "<html>";
-		
-		while (!attackerDice.isEmpty() && !defenderDice.isEmpty()) {
-			if (attackerDice.peek() > defenderDice.peek()) {
-				attackerDiceResult += ("<font color='red'>"+ attackerDice.peek().toString()+ "</font>   ");
-				defenderDiceResult += defenderDice.peek() + "   ";
-				defenderCasulties++;
-			} 
-			else {
-				defenderDiceResult += ("<font color='red'>"+ defenderDice.peek().toString()+ "</font>   ");
-				attackerDiceResult += attackerDice.peek() + "   ";
-				attackerCasulties++;
-			}
-			attackerDice.remove();
-			defenderDice.remove();
-		}
-		
-		while (!attackerDice.isEmpty()) {
-			attackerDiceResult += attackerDice.remove() + "   ";
-		}
-		attackerDiceResult += "</html>";
-		
-		while (!defenderDice.isEmpty()) {
-			defenderDiceResult += defenderDice.remove() + "   ";
-		}
-		defenderDiceResult += "</html>";
-		
-		attackerDiceLabel.setText(attackerDiceResult);
-		defenderDiceLabel.setText(defenderDiceResult);
-		
-		updateView();
-		
-		if (defender.getArmy() == defenderCasulties) {
-			GameController.getInstance().setAttackResult(attackerCasulties, 0);
-			
-			SpinnerNumberModel spinnerModel = new SpinnerNumberModel(attacker.getArmy() - 1, 
-					attackerDiceNum, attacker.getArmy() - 1, 1);
-			
-			JSpinner spinner = new JSpinner(spinnerModel);
-			Object[] message = {
-					"You conquered " + defender.getName(),
-					"Set armies in the conquered territory (" + attackerDiceNum + " - " + (attacker.getArmy() - 1) + ")",
-					spinner
-			};
-			
 
-		    Object[] options = {"OK"};
-			int result = JOptionPane.showOptionDialog(null, message, "Conquered Territory", 
-					JOptionPane.PLAIN_MESSAGE, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-			if (result == JOptionPane.OK_OPTION) {
-				attackerDiceLabel.setText(null);
-				defenderDiceLabel.setText(null);
-				GameController.getInstance().conquerTerritory((int) spinner.getValue());
-			} else {
-				attackerDiceLabel.setText(null);
-				defenderDiceLabel.setText(null);
-				GameController.getInstance().conquerTerritory((int) spinner.getValue());
-
-			}
-			
-		} else {
-			GameController.getInstance().setAttackResult(attackerCasulties, defenderCasulties);
-		}
-		
-	}
+	
 	/**
 	 * Method to add attack phase button listener
 	 */
@@ -470,23 +428,63 @@ public class PhaseView extends JPanel implements Observer{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String buttonText = ((JButton) e.getSource()).getText();
-	
+			
 			if (buttonText.equals("roll")) {
-				rollDice((int) attackerSpinner.getValue(), (int) defenderSpinner.getValue());
+				int attackerDiceNum = (int) attackerSpinner.getValue();
+				int defenderDiceNum = (int) defenderSpinner.getValue();
+				
+				attack(attacker, defender, attackerDiceNum, defenderDiceNum);			
 			} else if (buttonText.equals("all-out")) {
 				while(attacker != null && defender != null) {
-					rollDice(Math.min(3, attacker.getArmy() - 1), Math.min(2, defender.getArmy()));
+					attack(attacker, defender, Math.min(3, attacker.getArmy() - 1), Math.min(2, defender.getArmy()));
 				}
 				
 			} else if (buttonText.equals("stop")) {
 				attackerDiceLabel.setText(null);
 				defenderDiceLabel.setText(null);
-				GameController.getInstance().setAttack(null, null);
+				module.setupAttack(null, null);
 			}
 			
 		}
 		
-		
+		private void attack(Territory attacker, Territory defender, int attackerDiceNum, int defenderDiceNum) {
+			Territory attackerCopy = attacker;
+			Territory defenderCopy = defender;
+			
+			module.attack(attackerDiceNum, defenderDiceNum);
+
+			if (defenderCopy.getColor().equals(attackerCopy.getColor())) {
+				SpinnerNumberModel spinnerModel = new SpinnerNumberModel(attackerCopy.getArmy() - 1, 
+						attackerDiceNum, attackerCopy.getArmy() - 1, 1);
+				
+				JSpinner spinner = new JSpinner(spinnerModel);
+				Object[] message = {
+						"You conquered " + defenderCopy.getName(),
+						"Set armies in the conquered territory (" + attackerDiceNum + " - " + (attackerCopy.getArmy() - 1) + ")",
+						spinner
+				};
+				
+
+			    Object[] options = {"OK"};
+				int result = JOptionPane.showOptionDialog(null, message, "Conquered Territory", 
+						JOptionPane.PLAIN_MESSAGE, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+				
+				if (result == JOptionPane.OK_OPTION) {
+					attackerDiceLabel.setText(null);
+					defenderDiceLabel.setText(null);
+					module.conquer(attackerCopy, defenderCopy, (int) spinner.getValue());
+				} else {
+					attackerDiceLabel.setText(null);
+					defenderDiceLabel.setText(null);
+					module.conquer(attackerCopy, defenderCopy, (int) spinner.getValue());
+				}
+			}
+			
+			if (currentPlayer.getTerritoryMap().size() == module.getMap().getTerritoryMap().size()) {
+				JOptionPane.showMessageDialog(null, currentPlayer.getName() + " won the game.");
+				System.exit(0);
+			}
+		}
 	}
 	/**
 	 * Method add button listener
@@ -502,7 +500,7 @@ public class PhaseView extends JPanel implements Observer{
 						return;
 					} 
 					else {
-						GameController.getInstance().nextPhase();
+						module.nextPhase();
 					}
 					
 					break;
@@ -513,7 +511,7 @@ public class PhaseView extends JPanel implements Observer{
 						return;
 					} 
 					else {
-						GameController.getInstance().nextPhase();
+						module.nextPhase();
 					}
 					break;
 				}
@@ -521,10 +519,10 @@ public class PhaseView extends JPanel implements Observer{
 					int result = JOptionPane.showConfirmDialog(null, "Do you want to skip attack phase?", null, JOptionPane.YES_NO_OPTION);
 					
 					if (result == JOptionPane.YES_OPTION) {
-						GameController.getInstance().setAttack(null, null);
+						module.setupAttack(null, null);
 						attackerDiceLabel.setText(null);
 						defenderDiceLabel.setText(null);
-						GameController.getInstance().nextPhase();
+						module.nextPhase();
 					}	
 					break;
 				}
@@ -532,7 +530,7 @@ public class PhaseView extends JPanel implements Observer{
 					int result = JOptionPane.showConfirmDialog(null, "Do you want to skip this phase?", null, JOptionPane.YES_NO_OPTION);
 					
 					if (result == JOptionPane.YES_OPTION) {
-						GameController.getInstance().nextPhase();
+						module.nextPhase();
 					}	
 					break;
 				}

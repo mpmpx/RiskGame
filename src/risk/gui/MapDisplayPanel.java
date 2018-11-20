@@ -19,7 +19,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import risk.game.*;
-import risk.controller.*;
+
 /**
  * The main entrance of the game
  *
@@ -28,6 +28,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 
 	private Player currentPlayer;
 	private int currentPhase;
+	private Game module;
 	private RiskMap map;
 	private Territory selectedTerritory;
 	private Territory attackerTerritory;
@@ -37,23 +38,28 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	private HashMap<Point, Territory> locationMap;
 	private HashMap<String, LinkedList<Territory>> reachableMap;	
 	private HashMap<String, LinkedList<Territory>> attackableMap;
+	
+	
 	/**
 	 * Create the application.
 	 * The constructor method.
 	 */
 	public MapDisplayPanel() {
-		map = RiskMap.getInstance();
-		currentPlayer = null;
 		currentPhase = Phase.STARTUP;
-		selectedTerritory = null;
-		image = null;
 		territoryMap = new HashMap<String, Territory>();
 		locationMap = new HashMap<Point, Territory>();
 	}
+
 	/**
-	 * Initialize method
+	 * Initializes MapDisplayPanel with a module.
+	 * @param module a Game that is to be the module of this MapDisplayPanel.
 	 */
-	public void initialize() {
+	public void initialize(Game module) {
+		this.module = module;
+		module.addObserver(this);
+		addMouseListener(new Listener());
+		
+		map = module.getMap();
 		territoryMap = map.getTerritoryMap();
 		for (Territory territory : territoryMap.values()) {
 			locationMap.put(territory.getLocation(), territory);
@@ -64,22 +70,22 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		
 		paintImage();
 		repaint();
-		
-		this.addMouseListener(new Listener());
 	}
 	
 	/**
 	 * Method to update the MapDisplayPanel view
-	 * @param Observable observable class
-	 * @param Object argument.
+	 * @param observable observable class
+	 * @param arg argument.
 	 */
 	@Override
-	public void update(Observable obs, Object arg) {
-		currentPhase = ((Phase) obs).getCurrentPhase();
-		currentPlayer = ((Phase) obs).getCurrentPlayer();
+	public void update(Observable observable, Object arg) {
+		Game obs = (Game) observable;
+		
+		currentPhase = obs.getCurrentPhase();
+		currentPlayer = obs.getCurrentPlayer();
 		
 		if (currentPhase == Phase.FORTIFICATION) {
-			reachableMap = ((Phase) obs).getCurrentPlayer().getReachableMap();
+			reachableMap = obs.getCurrentPlayer().getReachableMap();
 		}
 		
 		if (currentPhase != Phase.FORTIFICATION) {
@@ -90,9 +96,9 @@ public class MapDisplayPanel extends JPanel implements Observer{
 		}
 		
 		if (currentPhase == Phase.ATTACK) {
-			attackableMap = ((Phase) obs).getCurrentPlayer().getAttackableMap();
-			attackerTerritory = ((Phase) obs).getAttacker();
-			defenderTerritory = ((Phase) obs).getDefender();
+			attackableMap = obs.getCurrentPlayer().getAttackableMap();
+			attackerTerritory = obs.getAttacker();
+			defenderTerritory = obs.getDefender();
 			
 			if (attackerTerritory == null && defenderTerritory == null) {
 				paintImage();
@@ -104,9 +110,8 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	 * Method to paint the image
 	 */
 	private void paintImage() {
-		image = map.getImage();
 		for (Territory territory : territoryMap.values()) {
-			paintTerritory(territory, territory.getOwner());
+			paintTerritory(territory, territory.getColor());
 		}
 	}
 	
@@ -132,8 +137,10 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	 */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
-        g.drawImage(image, 0, 0, null);
-        drawArmyNumber(g);
+        if (image != null) {
+        	g.drawImage(image, 0, 0, null);
+        	drawArmyNumber(g);
+        }
     }	
     
 	/**
@@ -156,7 +163,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	 * @return a territory based on give xy-coordinator.
 	 */
 	private Territory selectTerritory(int x, int y) {
-		for (Territory territory : RiskMap.getInstance().getTerritoryMap().values()) {
+		for (Territory territory : territoryMap.values()) {
 			if (territory.contains(new Point(x, y))) {
 				return territory;
 			}
@@ -212,7 +219,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				
 				int result = JOptionPane.showConfirmDialog(null, message, "Set armies", JOptionPane.OK_CANCEL_OPTION);
 				if (result == JOptionPane.OK_OPTION) {
-					GameController.getInstance().setArmy(territory, (int) spinner.getValue());
+					module.reinforce(territory, (int) spinner.getValue());
 					return;
 				}
 				else {
@@ -246,7 +253,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 						} 
 					
 						attackerTerritory = territory;
-						paintTerritory(territory, territory.getOwner().darker());
+						paintTerritory(territory, territory.getColor().darker());
 						repaint();
 					}
 				}
@@ -261,7 +268,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 					// Set defender territory
 					else {
 						defenderTerritory = territory;
-						paintTerritory(territory, territory.getOwner().darker());
+						paintTerritory(territory, territory.getColor().darker());
 						repaint();
 					}
 				}
@@ -278,7 +285,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				}
 			}
 			
-			GameController.getInstance().setAttack(attackerTerritory , defenderTerritory);
+			module.setupAttack(attackerTerritory , defenderTerritory);
 		}
 		
 		/**
@@ -297,7 +304,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 					}
 					
 					selectedTerritory = territory;
-					paintTerritory(territory, territory.getOwner().darker());
+					paintTerritory(territory, territory.getColor().darker());
 					repaint();
 				}
 				// Select arrival country.
@@ -321,8 +328,10 @@ public class MapDisplayPanel extends JPanel implements Observer{
 						
 						int result = JOptionPane.showConfirmDialog(null, message, "Fortification", JOptionPane.OK_CANCEL_OPTION);
 						if (result == JOptionPane.OK_OPTION) {
-							GameController.getInstance().fortify(selectedTerritory, territory, (int) spinner.getValue());
+							module.fortify(selectedTerritory, territory, (int) spinner.getValue());
+							paintTerritory(selectedTerritory, selectedTerritory.getColor());
 							selectedTerritory = null;
+							module.nextPhase();
 						}
 					}
 					

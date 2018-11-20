@@ -1,12 +1,12 @@
 package risk.gui;
 
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import risk.game.Game;
 
 /**
  * The panel of the game
@@ -18,6 +18,8 @@ public class GamePanel extends JPanel {
     private DominationView dominationView;
 	private CardExchangeView cardExchangeView;
     	
+	private Game module;
+	
 	/**
 	 * Constructor method
 	 */
@@ -26,26 +28,30 @@ public class GamePanel extends JPanel {
 		phaseView = new PhaseView();
 		dominationView = new DominationView();
 		cardExchangeView = new CardExchangeView();
-		phaseView.setCardExchangeView(cardExchangeView);
+
 	}
+	
 	/**
 	 * Initialize the contents of the panel
 	 * 
 	 */
 	public void initialize() {
-		mapDisplayPanel.initialize();
-		phaseView.initialize();
-		dominationView.initialize();
+		cardExchangeView.initialize(module);
+		phaseView.setCardExchangeView(cardExchangeView);
+		mapDisplayPanel.initialize(module);
+		phaseView.initialize(module);
+		dominationView.initialize(module);
 
-		JScrollPane scroll = new JScrollPane(mapDisplayPanel);
-		scroll.setPreferredSize(new Dimension(750, 750));
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.getViewport().setViewPosition(new Point(200, 200));	
-		add(scroll);		
+		JScrollPane displayScrollPanel = new JScrollPane(mapDisplayPanel);
+		displayScrollPanel.setPreferredSize(new Dimension(750, 750));
+		displayScrollPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		displayScrollPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		displayScrollPanel.getViewport().setViewPosition(new Point(200, 200));	
 		
+		add(displayScrollPanel);		
 		add(dominationView);
 		add(phaseView);
+
 	}
 	/**
 	 * Return the current phase view
@@ -79,4 +85,12 @@ public class GamePanel extends JPanel {
 	public CardExchangeView getCardExchangeView() {
 		return cardExchangeView;
 	}	
+	
+	/**
+	 * Sets the module of the GamePanel.
+	 * @param module a Game that is to be the module of this GamePanel.
+	 */
+	public void setModule(Game module) {
+		this.module = module;
+	}
 }

@@ -14,15 +14,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import risk.controller.GameController;
 import risk.game.*;
 
 /**
- * This class is the GUI for the Card Exchange View Panel, showing player
- * exchange card for infantry if the player has more than 3 cards
+ * This is a GUI which displays hand cards of current playing player and provides interaction methods 
+ * for users to exchange cards for bonus armies. It is also an observer that observes its module.
  */
 public class CardExchangeView extends JPanel implements Observer {
 
+	private Game module;
 	private Player currentPlayer;
 	private Cards cards;
 	private LinkedList<JButton> buttonList;
@@ -32,19 +32,15 @@ public class CardExchangeView extends JPanel implements Observer {
 	private JButton exchangeButton;
 	private JButton clearButton;
 	private JButton exitButton;
-	
+		
 	/**
-	 * Constructor with coming parameter
-	 * 
-	 * @override
-	 *            actionPerformed
+	 * Creates the CardExchangeView panel.
 	 */
 	public CardExchangeView() {
 		buttonList = new LinkedList<JButton>();
 		exchangeButton = new JButton("Exchange");
 		exchangeButton.addActionListener(new ExchangeListener());
 		exchangeButton.setEnabled(false);		
-		
 		clearButton = new JButton("Clear");
 		clearButton.addActionListener(new ClearListener());
 		clearButton.setEnabled(false);
@@ -68,16 +64,31 @@ public class CardExchangeView extends JPanel implements Observer {
 	}
 	
 	/**
+	 * Initialize the CardExchangeView panel with a module.
+	 * @param module a Game that is to be the module of this panel.
+	 */
+	public void initialize(Game module) {
+		this.module = module;
+		module.addObserver(this);
+	}
+	
+	/**
 	 * Method to update the CardExchange view
-	 * @param Observable observable class
-	 * @param Object argument.
+	 * @param observable observable class
+	 * @param arg argument.
 	 */
 	@Override
-	public void update(Observable obs, Object arg1) {
-		currentPlayer = ((Phase) obs).getCurrentPlayer();
+	public void update(Observable observable, Object arg) {
+		Game obs = (Game) observable;
+		
+		currentPlayer = obs.getCurrentPlayer();
 		cards = currentPlayer.getCardSet();
-		exchangeBonusArmy = ((Phase) obs).getExchangeBonusArmy();
+		exchangeBonusArmy = obs.getExchangeBonusArmy();
 		updateView();
+		
+		if (cards.getSize() >= 5 && !getRootPane().getParent().isVisible()) {
+			getRootPane().getParent().setVisible(true);
+		}
 	}
 	
 	/**
@@ -124,17 +135,14 @@ public class CardExchangeView extends JPanel implements Observer {
 				JButton btn = new JButton();
 				switch (card) {
 					case Cards.CAVALRY : {
-						btn.setName("Cavalry");
 						btn.setText("Cavalry");
 						break;
 					}
 					case Cards.INFANTRY : {
-						btn.setName("Infantry");
 						btn.setText("Infantry");
 						break;
 					}
 					case Cards.CANNON : {
-						btn.setName("Cannon");
 						btn.setText("Cannon");
 						break;
 					}
@@ -226,9 +234,8 @@ public class CardExchangeView extends JPanel implements Observer {
 					}
 				}
 				
-				cards.removeCards(exchangedCards);
+				module.exchangeCards(exchangedCards);
 				reset();
-				GameController.getInstance().exchangeCards(exchangedCards);
 			}
 		}
 	}
@@ -254,7 +261,7 @@ public class CardExchangeView extends JPanel implements Observer {
 			JButton btn = (JButton) e.getSource();
 			if (btn.isEnabled()) {
 				if (selectedCards[0] + selectedCards[1] + selectedCards[2] < 3) {
-					switch (btn.getName()) {
+					switch (btn.getText()) {
 						case "Cavalry" :{
 							selectedCards[Cards.CAVALRY]++;
 							break;

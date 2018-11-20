@@ -2,7 +2,6 @@ package risk.gui;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
@@ -15,13 +14,15 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 
 import risk.game.*;
+
 /**
  * This class is the GUI for the Domination View Panel
  */
 public class DominationView extends JPanel implements Observer{
 
-	Player[] players;
-	LinkedList<JTextArea> textAreaList;
+	private Player[] players;
+	private LinkedList<JTextArea> textAreaList;
+	private RiskMap map;
 	
 	/**
 	 * Constructor method
@@ -33,23 +34,25 @@ public class DominationView extends JPanel implements Observer{
 	}
 	
 	/**
-	 * Initialization method
-	 * 
+	 * Initializes DominationView with a module.
+	 * @param module a Game that is to be the module of this DominationView panel.
 	 */
-	public void initialize() {
-		BufferedImage image = RiskMap.getInstance().getImage();
+	public void initialize(Game module) {
+		module.addObserver(this);
+		map = module.getMap();
 		setPreferredSize(new Dimension(200, 750));
 		setLayout(new GridLayout(6, 1));
 	}
 	
 	/**
 	 * Method to update the phase view
-	 * @param Observable observable class
-	 * @param Object argument.
+	 * @param observable observable class
+	 * @param object argument.
 	 */
 	@Override
-	public void update(Observable obs, Object object) {
-		players = ((Phase) obs).getPlayers();
+	public void update(Observable observable, Object object) {
+		Game obs = (Game) observable;
+		players = obs.getPlayers();
 		textAreaList.clear();
 		for (Player player : players) {
 			JTextArea textArea = new JTextArea();
@@ -58,11 +61,13 @@ public class DominationView extends JPanel implements Observer{
 			String content = "";
 			content += player.getName() + ":\n";
 			content += ("Map controlled: " + 
-					player.getTerritoryMap().size() * 100 / RiskMap.getInstance().getTerritoryMap().size() + "%\n");
+					player.getTerritoryMap().size() * 100 / map.getTerritoryMap().size() + "%\n");
 			
 			content += ("Continents controlled: \n");
-			for (Continent continent : player.getControlledContinent()) {
-				content += "    " + continent.getName() + "\n";
+			for (Continent continent : player.getControlledContinent().keySet()) {
+				if (player.getControlledContinent().get(continent)) {
+					content += "    " + continent.getName() + "\n";
+				}
 			}
 			content += "\n";
 			

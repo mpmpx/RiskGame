@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * This class represents all of the data and functionality that related to map
+ * This class represents a map of Risk game. It maintains an image of the map and 
+ * all continents, territories and links.
  */
 
 public class RiskMap {
@@ -13,30 +14,16 @@ public class RiskMap {
 	public final static int MAX_COUNTRY = 255;
 	public final static int MAX_ADJACENT_COUNTRIES = 10;
 	
-	private static RiskMap riskMap;
 	private BufferedImage image;
 	private HashMap<String, Continent> continentMap;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<String, LinkedList<String>> edgeMap;
-	
-	
+
 	/**
-	 * Create a new and empty map when riskMap is null.
-	 * @return riskMap
-	 */
-	public static RiskMap getInstance() {
-		if (riskMap == null) {
-			riskMap = new RiskMap();
-		}
-		
-		return riskMap;
-	}
-	
-	/**
-	 * a private RiskMap constructor
+	 * Creates a map of Risk.
 	 * 
 	 */
-	private RiskMap() {
+	public RiskMap() {
 		image = null;
 		continentMap = new HashMap<String, Continent>();
 		territoryMap = new HashMap<String, Territory>();
@@ -44,7 +31,7 @@ public class RiskMap {
 	}
 	
 	/**
-	 * Initial function of the class, normalize the local variables.
+	 * Clears all variables of the class.
 	 */
 	public void clear() {
 		image = null;
@@ -54,94 +41,81 @@ public class RiskMap {
 	}
 	
 	/**
-	 * save the image 
-	 * 
-	 * @param image
+	 * Sets the image of the map.
+	 * @param image an image that is to be the map's image.
 	 */
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
 	
 	/**
-	 * Return the current Image.
-	 * 
-	 * @return The current Image.
+	 * Returns the image.
+	 * @return The image.
 	 */
 	public BufferedImage getImage() {
 		return image;
 	}
 	
 	/**
-	 * Add a qualified continent to the local variables.
-	 * 
-	 * @param newContinent
-	 *            The input continent.
+	 * Adds a new continent.
+	 * @param newContinent a continent that is to be added.
 	 */
 	public void addContinent(Continent newContinent) {
 		continentMap.put(newContinent.getName(), newContinent);
 	}
 	
 	/**
-	 * Get the current Image.
-	 * 
-	 * @return continentMap.
+	 * Returns the hash map contains all territories.
+	 * @return continentMap the hash map contains all territories.
 	 */
 	public HashMap<String, Continent> getContinentMap() {
 		return continentMap;
 	}
 	
 	/**
-	 * Add a qualified territory to the local variables.
-	 * 
-	 * @param territory
-	 *            The input territory.
-	 * 
+	 * Adds a new territory.
+	 * @param territory a territory that is to be added.
 	 */
 	public void addTerritory(Territory territory) {
 		territoryMap.put(territory.getName(), territory);
 	}
 	
 	/**
-	 * updating the territory information, and replace it with thhe new territory name.
-	 * 
-	 * @param territory
+	 * Updates the territory information.
+	 * @param territory the territory that is to be updated.
 	 */
 	public void updateTerritory(Territory territory) {
 		territoryMap.replace(territory.getName(), territory);
 	}
 	
 	/**
-	 * Get the territory map.
-	 * 
-	 * @return territoryMap.
+	 * Returns the territory map.
+	 * @return he territory map.
 	 */
 	public HashMap<String, Territory> getTerritoryMap() {
 		return territoryMap;
 	}
 	
 	/**
-	 * method building connections among territories
-	 * 
-	 * @param territory
-	 * @param adjacentList
+	 * Adds links of a territory.
+	 * @param territory add links to this territory.
+	 * @param adjacentList a list of territories link to the given territory.
 	 */
 	public void addLink(String territory, LinkedList<String> adjacentList) {
 		edgeMap.put(territory, adjacentList);
 	}
 	
 	/**
-	 * method building connections among territories
-	 * 
-	 * @param newEdgeMap
+	 * Adds a hash map contains all links.
+	 * @param newEdgeMap a hash map contains all links.
 	 */
 	public void addLink(HashMap<String, LinkedList<String>> newEdgeMap) {
 		this.edgeMap = newEdgeMap;
 	}
 	
 	/**
-	 * Get the edge map.
-	 * 
-	 * @return edgeMap.
+	 * Returns the hash map contains all links.
+	 * @return the hash map contains all links.
 	 */
 	public HashMap<String, LinkedList<String>> getEdgeMap() {
 		return edgeMap;

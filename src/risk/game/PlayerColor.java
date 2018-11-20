@@ -5,7 +5,6 @@ import java.awt.Color;
 
 /**
  * PlayerColor class contains a set of colors to be used for representing players on the map.
- *
  */
 public class PlayerColor {
 
@@ -22,7 +21,7 @@ public class PlayerColor {
 	
 	
 	/**
-	 * Get next color in the list.
+	 * Returns next color in the list.
 	 * @return a color
 	 */
 	public static Color nextColor() {
