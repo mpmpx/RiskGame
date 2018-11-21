@@ -40,7 +40,7 @@ public class DominationView extends JPanel implements Observer{
 	public void initialize(Game module) {
 		module.addObserver(this);
 		map = module.getMap();
-		setPreferredSize(new Dimension(200, 750));
+		setPreferredSize(new Dimension(MainFrame.WIDTH * 2 / 10, MainFrame.HEIGHT * 7 / 10));
 		setLayout(new GridLayout(6, 1));
 	}
 	
