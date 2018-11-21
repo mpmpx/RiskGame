@@ -43,7 +43,7 @@ public class GamePanel extends JPanel {
 		dominationView.initialize(module);
 
 		JScrollPane displayScrollPanel = new JScrollPane(mapDisplayPanel);
-		displayScrollPanel.setPreferredSize(new Dimension(750, 750));
+		displayScrollPanel.setPreferredSize(new Dimension(MainFrame.WIDTH * 7 / 10, MainFrame.HEIGHT * 7 / 10));
 		displayScrollPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		displayScrollPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		displayScrollPanel.getViewport().setViewPosition(new Point(200, 200));	

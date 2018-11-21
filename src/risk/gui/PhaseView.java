@@ -71,7 +71,7 @@ public class PhaseView extends JPanel implements Observer{
 		attacker = null;
 		defender = null;
 		
-		setPreferredSize(new Dimension(MainFrame.WIDTH, 200));
+		setPreferredSize(new Dimension(MainFrame.WIDTH, MainFrame.HEIGHT * 2 / 10));
 		nextButton.addActionListener(new ButtonListener());
 	}
 

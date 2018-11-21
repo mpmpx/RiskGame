@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -31,8 +32,9 @@ import risk.game.RiskMap;
  * Main frame that contains all panels and components.
  */
 public class MainFrame extends JFrame {
-	public final static int WIDTH = 1000;
-	public final static int HEIGHT = 1000;
+	
+	public final static int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width * 6 / 10;
+	public final static int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height * 9 / 10;
 	public final static String MENU_PANEL = "Menu Panel";
 	public final static String GAME_PANEL = "Game Panel";
 	
@@ -43,7 +45,7 @@ public class MainFrame extends JFrame {
 	private Game module;
 	private JButton startButton;
 	
-	private final String[] playerBehaviour = {"None", "Human", "Aggressive", "Benevolent", "Random", "Cheater"};
+	private final String[] playerbehavior = {"None", "Human", "Aggressive", "Benevolent", "Random", "Cheater"};
 	private JTextField mapFilePath;
 	private JComboBox[] playersBox;
 	
@@ -83,7 +85,7 @@ public class MainFrame extends JFrame {
 		mapFilePath.setPreferredSize(new Dimension(100,20));
 		playersBox = new JComboBox[6];
 		for (int i = 0; i < 6; i++) {
-			playersBox[i] = new JComboBox(playerBehaviour);
+			playersBox[i] = new JComboBox(playerbehavior);
 		}
 	}
 	
@@ -178,14 +180,14 @@ public class MainFrame extends JFrame {
 					JOptionPane.PLAIN_MESSAGE);
 			
 			if (playerDialogResult == JOptionPane.OK_OPTION) {
-				LinkedList<String> behaviours = new LinkedList<String>();
+				LinkedList<String> behaviors = new LinkedList<String>();
 				for (int i = 0; i < 6; i++) {
 					if ((String)playersBox[i].getSelectedItem() != "None") {
-						behaviours.add((String)playersBox[i].getSelectedItem());
+						behaviors.add((String)playersBox[i].getSelectedItem());
 					}
 				}
 				
-				if (behaviours.size() < 2 || mapFilePath.getText().length() == 0) {
+				if (behaviors.size() < 2 || mapFilePath.getText().length() == 0) {
 					JOptionPane.showMessageDialog(null, "Please select a map and more than 2 players.");
 					return;
 				}
@@ -194,10 +196,11 @@ public class MainFrame extends JFrame {
 					map = readFileController.readFile(selectedFile.getAbsolutePath());
 				} catch (Exception exception) {
 					JOptionPane.showMessageDialog(null, exception.getMessage());
+					exception.printStackTrace();
 					return;
 				}
 				module.setMap(map);
-				module.setPlayers(behaviours);
+				module.setPlayers(behaviors);
 				module.distributeTerritories();
 				((GamePanel) panels.get(GAME_PANEL)).initialize();
 				module.start();
