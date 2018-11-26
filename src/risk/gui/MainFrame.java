@@ -10,22 +10,27 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 import risk.controller.ReadFileController;
+import risk.controller.SaveLoadGameController;
 import risk.game.Game;
+import risk.game.Player;
 import risk.game.RiskMap;
 
 /**
@@ -44,10 +49,16 @@ public class MainFrame extends JFrame {
 	
 	private Game module;
 	private JButton startButton;
+	private JButton tournamentButton;
+	private JButton loadButton;
 	
-	private final String[] playerbehavior = {"None", "Human", "Aggressive", "Benevolent", "Random", "Cheater"};
-	private JTextField mapFilePath;
-	private JComboBox[] playersBox;
+	private final String[] playerBehavior = {"None", "Human", "Aggressive", "Benevolent", "Random", "Cheater"};
+	private JTextField startMapFilePath;
+	private JTextField[] tournamentMapFilePath;
+	private JComboBox[] startPlayersBox;
+	private JCheckBox[] tournamentPlayersBox;
+	private JSpinner maxTurnSpinner;
+	private JSpinner gameNumSpinner;
 	
 	private File selectedFile;
 	
@@ -80,12 +91,25 @@ public class MainFrame extends JFrame {
 		((CardLayout) contentPanel.getLayout()).show(contentPanel,  MENU_PANEL);
 		setVisible(true);
 		
-		mapFilePath = new JTextField();
-		mapFilePath.setEditable(false);
-		mapFilePath.setPreferredSize(new Dimension(100,20));
-		playersBox = new JComboBox[6];
+		startMapFilePath = new JTextField();
+		startMapFilePath.setEditable(false);
+		startMapFilePath.setPreferredSize(new Dimension(100,20));
+		
+		tournamentMapFilePath = new JTextField[5];
+		for (int i = 0; i < 5; i++) {
+			tournamentMapFilePath[i] = new JTextField();
+			tournamentMapFilePath[i].setEditable(false);
+			tournamentMapFilePath[i].setPreferredSize(new Dimension(100,20));
+		}
+		
+		startPlayersBox = new JComboBox[6];
 		for (int i = 0; i < 6; i++) {
-			playersBox[i] = new JComboBox(playerbehavior);
+			startPlayersBox[i] = new JComboBox(playerBehavior);
+		}
+		
+		tournamentPlayersBox = new JCheckBox[4];
+		for (int i = 0; i < 4; i++) {
+			tournamentPlayersBox[i] = new JCheckBox(playerBehavior[i + 2]);
 		}
 	}
 	
@@ -100,7 +124,24 @@ public class MainFrame extends JFrame {
 		
 		startButton = new JButton("Start");
 		startButton.addActionListener(new StartListener());
+		tournamentButton = new JButton("Tournament");
+		tournamentButton.addActionListener(new TournamentListener());
+		loadButton = new JButton("Load");
+		loadButton.addActionListener(new LoadListener());
+		
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weighty = 10;
 		menuPanel.add(startButton, c);
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		menuPanel.add(tournamentButton, c);
+		
+		c.gridx = 0;
+		c.gridy = 2;
+		menuPanel.add(loadButton, c);
+		
 		panels.put(MENU_PANEL, menuPanel);
 		addPanel(menuPanel, MENU_PANEL);
 
@@ -133,31 +174,6 @@ public class MainFrame extends JFrame {
 	}
 	
 	/**
-	 * Reads map file and store data into a RiskMap, then sets the map to the module.
-	 * @throws IOException if map is invalid.
-	 */
-	private void loadMap() throws Exception {
-		RiskMap map;
-		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-		fileChooser.setDialogTitle("Select a map file");
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Map file", "map");
-		fileChooser.addChoosableFileFilter(filter);
-
-		int returnValue = fileChooser.showOpenDialog(null);
-
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = fileChooser.getSelectedFile();
-			ReadFileController readFileController = new ReadFileController();
-			map = readFileController.readFile(selectedFile.getAbsolutePath());
-		} else {
-			throw new Exception("You did not select a map file.");
-		}
-
-		module.setMap(map);
-	}
-	
-	/**
 	 * Methods of the start button's action listener.
 	 */
 	private class StartListener implements ActionListener {
@@ -166,15 +182,15 @@ public class MainFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton loadMapButton = new JButton("Load Map");
-			loadMapButton.addActionListener(new LoadMapListener());
+			loadMapButton.addActionListener(new LoadMapListener(startMapFilePath));
 
-			Object[] message = { loadMapButton, mapFilePath, 
-					"player1", playersBox[0], 
-					"player2", playersBox[1],
-					"player3", playersBox[2],
-					"player4", playersBox[3],
-					"player5", playersBox[4],
-					"player6", playersBox[5] };
+			Object[] message = { loadMapButton, startMapFilePath, 
+					"player1", startPlayersBox[0], 
+					"player2", startPlayersBox[1],
+					"player3", startPlayersBox[2],
+					"player4", startPlayersBox[3],
+					"player5", startPlayersBox[4],
+					"player6", startPlayersBox[5] };
 
 			int playerDialogResult = JOptionPane.showConfirmDialog(null, message, "Setup", JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.PLAIN_MESSAGE);
@@ -182,15 +198,16 @@ public class MainFrame extends JFrame {
 			if (playerDialogResult == JOptionPane.OK_OPTION) {
 				LinkedList<String> behaviors = new LinkedList<String>();
 				for (int i = 0; i < 6; i++) {
-					if ((String)playersBox[i].getSelectedItem() != "None") {
-						behaviors.add((String)playersBox[i].getSelectedItem());
+					if ((String)startPlayersBox[i].getSelectedItem() != "None") {
+						behaviors.add((String)startPlayersBox[i].getSelectedItem());
 					}
 				}
 				
-				if (behaviors.size() < 2 || mapFilePath.getText().length() == 0) {
+				if (behaviors.size() < 2 || startMapFilePath.getText().length() == 0) {
 					JOptionPane.showMessageDialog(null, "Please select a map and more than 2 players.");
 					return;
 				}
+				
 				ReadFileController readFileController = new ReadFileController();
 				try {
 					map = readFileController.readFile(selectedFile.getAbsolutePath());
@@ -208,9 +225,9 @@ public class MainFrame extends JFrame {
 				
 			} 
 			
-			mapFilePath.setText(null);
+			startMapFilePath.setText(null);
 			for (int i = 0; i < 6; i++) {
-				playersBox[i].setSelectedIndex(0);
+				startPlayersBox[i].setSelectedIndex(0);
 			}
 		}
 	}
@@ -219,6 +236,12 @@ public class MainFrame extends JFrame {
 	 * Customized ActionListener for "Load Map" button.
 	 */
 	private class LoadMapListener implements ActionListener {
+		
+		private JTextField mapFilePath;
+		
+		public LoadMapListener(JTextField mapFilePath) {
+			this.mapFilePath = mapFilePath;
+		}
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -234,7 +257,165 @@ public class MainFrame extends JFrame {
 				selectedFile = fileChooser.getSelectedFile();
 				mapFilePath.setText(selectedFile.getPath());
 			}
+		}
+	}
+	
+	/**
+	 * The action listener for tournament button.
+	 */
+	private class TournamentListener implements ActionListener {
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			SpinnerModel gameNumModel = new SpinnerNumberModel(1,  1, 5, 1);               
+			SpinnerModel maxTurnModel = new SpinnerNumberModel(10, 10, 50, 1);
+			
+			gameNumSpinner = new JSpinner(gameNumModel);
+			maxTurnSpinner = new JSpinner(maxTurnModel);
+			
+			JButton[] loadMapButton = new JButton[5];
+			
+			for (int i = 0; i <5; i++) {
+				loadMapButton[i] = new JButton("Load Map" + (i+1) );
+				loadMapButton[i].addActionListener(new LoadMapListener(tournamentMapFilePath[i]));
+			}
+			
+			Object[] message = { loadMapButton[0], tournamentMapFilePath[0], 
+					loadMapButton[1], tournamentMapFilePath[1],
+					loadMapButton[2], tournamentMapFilePath[2],
+					loadMapButton[3], tournamentMapFilePath[3],
+					loadMapButton[4], tournamentMapFilePath[4],
+					"Game number:", gameNumSpinner,
+					"Max turns:", maxTurnSpinner,
+					"player", tournamentPlayersBox[0], 
+					tournamentPlayersBox[1],
+					tournamentPlayersBox[2],
+					tournamentPlayersBox[3]};
+
+			int playerDialogResult = JOptionPane.showConfirmDialog(null, message, "Setup", JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE);
+			
+			if (playerDialogResult == JOptionPane.OK_OPTION) {
+				LinkedList<String> playerBehaviors = new LinkedList<String>();
+				for (int i = 0; i < 4; i++) {
+					if (tournamentPlayersBox[i].isSelected()) {
+						playerBehaviors.add(tournamentPlayersBox[i].getText());
+					}
+				}
+				
+				LinkedList<String> mapPathList = new LinkedList<String>();
+				for (int i = 0; i < 5; i++) {
+					if (tournamentMapFilePath[i].getText().length() > 0) {
+						mapPathList.add(tournamentMapFilePath[i].getText());
+					}
+				}
+				
+				int gameNum = (int) gameNumSpinner.getValue();
+				int maxTurnNum = (int) maxTurnSpinner.getValue();
+				
+				String[][] result = new String[mapPathList.size()][gameNum];
+				
+				if (mapPathList.size() == 0) {
+					JOptionPane.showMessageDialog(null, "You must select at least one map");
+					return;
+				}
+				
+				if (playerBehaviors.size() < 2) {
+					JOptionPane.showMessageDialog(null, "You must select at least two players");
+				}
+				
+				for (int i = 0; i < mapPathList.size(); i++) {
+					ReadFileController controller = new ReadFileController();
+					RiskMap map = null;
+					try {
+						map = controller.readFile(mapPathList.get(i));
+					} catch (Exception exception) {
+						JOptionPane.showMessageDialog(null, exception.getMessage());
+						exception.printStackTrace();
+						return;
+					}
+					
+					for (int j = 0; j < gameNum; j++) {
+						map.reset();
+						Game game = new Game();
+						game.setMap(map);
+						game.setMaxTurn(maxTurnNum);
+						game.setPlayers(playerBehaviors);
+						game.distributeTerritories();
+						game.start();
+						
+						Player winner = game.getWinner();
+						if (winner == null) {
+							result[i][j] = "DRAW";
+						}
+						else {
+							result[i][j] = winner.getStrategy().getBehavior().toString();
+						}
+					}
+				}
+				
+				Vector<String> columnNames = new Vector<String>();
+				
+				columnNames.add(" ");
+				for (int i = 0; i < gameNum; i++) {
+					columnNames.add("Game " + (i + 1));
+				}
+				
+				Vector<Vector<String>> data = new Vector<Vector<String>>();
+				data.add(columnNames);
+				for (int i = 0; i < mapPathList.size(); i++) {
+					Vector<String> row = new Vector<String>();
+					row.add("Map" + (i + 1));
+					for (int j = 0; j < gameNum; j++) {
+						row.add(result[i][j]);
+					}
+					data.add(row);
+				}
+				
+				JTable table = new JTable(data, columnNames);
+				Object[] resultMessage = {"Result: ", table};
+				JOptionPane.showMessageDialog(null, resultMessage);
+				
+			}
+			
+			for (int i = 0; i < 5; i++) {
+				tournamentMapFilePath[i].setText(null);
+			}
+		
+			for (int i = 0; i < 4; i++) {
+				tournamentPlayersBox[i].setSelected(false);
+			}
+		}
+		
+	}
+	
+	/**
+	 * The action listener for "Load" button.
+	 */
+	private class LoadListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			SaveLoadGameController controller = new SaveLoadGameController();
+			Game game = null;
+			
+			JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+			fileChooser.setDialogTitle("Select a saved file");
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Save file", "save");
+			fileChooser.addChoosableFileFilter(filter);
+
+			int returnValue = fileChooser.showOpenDialog(null);
+
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				selectedFile = fileChooser.getSelectedFile();
+				module = controller.loadGame(selectedFile.getPath());
+				((GamePanel) panels.get(GAME_PANEL)).setModule(module);
+				((GamePanel) panels.get(GAME_PANEL)).initialize();
+				module.load();
+				
+				((CardLayout) contentPanel.getLayout()).show(contentPanel, GAME_PANEL);
+			}
 		}
 	}
 }
