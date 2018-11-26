@@ -2,13 +2,15 @@ package risk.game;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
  * This class represents a territory and maintains status and data including name, color, owner,
  * location, number of armies, shape and territory it belongs to.
  */
-public class Territory {
+public class Territory implements Serializable {
 
 	private String name;
 	private Player owner;
@@ -17,12 +19,14 @@ public class Territory {
 	private Color ownerColor;
 	private int army;
 	private LinkedList<Point> shape;
+	private HashMap<String, Territory> adjacent;
 	
 	/**
 	 * Creates a territory.
 	 */
 	public Territory() {
 		shape = new LinkedList<Point>();
+		adjacent = new HashMap<String, Territory>();
 		army = 0;
 	}
 	/**
@@ -33,9 +37,10 @@ public class Territory {
 	
 	public Territory(String name, Point location) {
 		this.name = name;
-		continentName = null;
 		this.location = location;
 		army = 0;
+		shape = new LinkedList<Point>();
+		adjacent = new HashMap<String, Territory>();
 	}
 	
 	/**
@@ -198,5 +203,31 @@ public class Territory {
 	 */
 	public boolean contains(Point location) {
 		return shape.contains(location);
+	}
+	
+	/**
+	 * Adds a territory in the adjacent territory hash map.
+	 * @param territory a territory that is to be added in the adjacent 
+	 * territory hash map.
+	 */
+	public void addAdjacent(Territory territory) {
+		adjacent.put(territory.getName(), territory);
+	}
+	
+	/**
+	 * Removes a territory from the adjacent territory hash map.
+	 * @param territory a territory that is to be removed from the adjacent 
+	 * territory hash map.
+	 */
+	public void removeAdjacent(Territory territory) {
+		adjacent.remove(territory.getName());
+	}
+	
+	/**
+	 * Returns a adjacent territory hash map.
+	 * @return a hash map contains all adjacent territories of this territory.
+	 */
+	public HashMap<String, Territory> getAdjacent() {
+		return adjacent;
 	}
 }

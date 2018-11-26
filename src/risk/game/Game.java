@@ -1,18 +1,21 @@
 package risk.game;
 
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.PriorityQueue;
 import java.util.Random;
-import java.util.Stack;
+
+import risk.game.strategy.*;
+import risk.game.strategy.Strategy;
+import risk.game.strategy.Strategy.Behavior;
 
 /**
  * The Game class simulates game process of the Risk game. It maintains status of game including 
  * current playing phase and player, and simulates game process and players' moves.
  */
-public class Game extends Observable{
+public class Game extends Observable implements Serializable{
  	
 	private Phase phase;
 	private int playerNum;
@@ -21,11 +24,14 @@ public class Game extends Observable{
 	private LinkedList<Player> playerQueue;
 	private RiskMap map;
 	private int exchangeBonusArmy;
-	private PriorityQueue<Integer> attackerDice;
-	private PriorityQueue<Integer> defenderDice;
 	private Territory attacker;
 	private Territory defender;
 	private Player winner;
+	private int maxTurn;
+	private int turn;
+	
+	private PriorityQueue<Integer> attackerDice;
+	private PriorityQueue<Integer> defenderDice;
 	
 	/**
 	 * Creates a game with initial exchange bonus armies with 5.
@@ -33,25 +39,69 @@ public class Game extends Observable{
 	public Game() {
 		playerNum = 0;
 		exchangeBonusArmy = 5;
+		maxTurn = -1;
+		turn = 0;
 		playerQueue = new LinkedList<Player>();
-		attackerDice = new PriorityQueue<Integer>();
-		defenderDice = new PriorityQueue<Integer>();
+		attackerDice = new PriorityQueue<Integer>(Collections.reverseOrder());
+		defenderDice = new PriorityQueue<Integer>(Collections.reverseOrder());
 	}
 	
+
 	/**
-	 * Sets number of players of this game;
-	 * @param playerNum an integer that is to be set as number
-	 * of players of this game.
+	 * Sets players to the game with player's behaviors.
+	 * @param behaviors a list of behaviors of players.
 	 */
-	public void setPlayers (LinkedList<String> behaviours) {
-		playerNum = behaviours.size();
+	public void setPlayers (LinkedList<String> behaviors) {
+		playerNum = behaviors.size();
 		players = new Player[playerNum];
+
+		
 		for (int i = 0; i < playerNum; i++) {
+			Strategy strategy = null;
 			players[i] = new Player("player" + (i + 1));
+			switch (behaviors.get(i)) {
+				case "Human" : {
+					strategy = new HumanStrategy(players[i]);
+					break;
+				}
+				case "Aggressive": {
+					strategy = new AggressiveStrategy(players[i]);
+					break;
+				}
+				case "Benevolent": {
+					strategy = new BenevolentStrategy(players[i]);
+					break;
+				}
+				case "Random": {
+					strategy = new RandomStrategy(players[i]);
+					break;
+				}
+				case "Cheater": {
+					strategy = new CheaterStrategy(players[i]);
+					break;
+				}
+			}
+			
+			players[i].setStrategy(strategy);
 			playerQueue.add(players[i]);
+			
+			LinkedList<Continent> continentList = new LinkedList<Continent>();
+			for (Continent continent : map.getContinentMap().values()) {
+				continentList.add(continent);
+			}
+			players[i].setContinents(continentList);
+			
 		}
 		
 		currentPlayer = players[0];
+	}
+	
+	/**
+	 * Sets the maximum turns of this game.
+	 * @param maxTurn a number that is to be the maximum turns of this game.
+	 */
+	public void setMaxTurn(int maxTurn) {
+		this.maxTurn = maxTurn;
 	}
 	
 	/**
@@ -86,6 +136,10 @@ public class Game extends Observable{
 		return map;
 	}
 	
+	/**
+	 * Returns the winner of the game.
+	 * @return the winner of the game.
+	 */
 	public Player getWinner() {
 		return winner;
 	}
@@ -99,6 +153,7 @@ public class Game extends Observable{
 			Player player = players[r.nextInt(playerNum)];
 			territory.setColor(player.getColor());
 			territory.setOwner(player);
+			territory.setArmy(1);
 			player.addTerritory(territory);
 		}
 	}
@@ -109,8 +164,10 @@ public class Game extends Observable{
 	public void start() {
 		phase = new Phase();
 		setInitialArmy();
-		setChanged();
-		notifyObservers();
+		
+		if (currentPlayer.getStrategy().getBehavior() != Behavior.HUMAN) {
+			AIMove();
+		}
 	}
 	
 	/**
@@ -145,38 +202,38 @@ public class Game extends Observable{
 				}
 			}			
 		}
+		update();
 	}
 	
 	/**
 	 * Proceeds game to next phase.
 	 */
-	public void nextPhase() {
-		int currentPhase = phase.getCurrentPhase();
-		
+	public void nextPhase() {		
 		switch (phase.getCurrentPhase()) {
 			case Phase.STARTUP : {
-				if (currentPlayer == players[playerNum - 1]) {
-					phase.nextPhase();
-				}
 				currentPlayer = nextPlayer();
+				if (currentPlayer == players[0]) {
+					phase.nextPhase();
+					turn++;
+				}
 				break;
 			}
 			case Phase.REINFORCEMENT : {
 				phase.nextPhase();
-				updateAttackableMap();
 				break;
 			}
 			case Phase.ATTACK : {
-				phase.nextPhase();
 				attackerDice.clear();
 				defenderDice.clear();
-				updateReachableMap();
+				phase.nextPhase();
 				break;
 			}
 			case Phase.FORTIFICATION : {
 				currentPlayer.getNewCard();
 				phase.nextPhase();
 				currentPlayer = nextPlayer();
+				turn++;
+				
 				break;
 			}
 			default : {
@@ -184,12 +241,94 @@ public class Game extends Observable{
 			}
 		}
 		
-		if (phase.getCurrentPhase() == Phase.REINFORCEMENT) {
-			currentPlayer.getReinforcement();
+		if (turn == maxTurn) {
+			return;
 		}
 		
+		if (currentPlayer.getStrategy().getBehavior() == Behavior.HUMAN) {
+			playerMove();
+		}
+		else {
+			AIMove();
+		}
+		
+	}
+	
+	/**
+	 * Set the status of this observable class as changed and notify
+	 * its observers.
+	 */
+	private void update() {
 		setChanged();
 		notifyObservers();
+	}
+	
+	/**
+	 * Executes methods when it is turn to a human player.
+	 */
+	private void playerMove() {
+		switch (phase.getCurrentPhase()) {
+			case Phase.REINFORCEMENT : {
+				currentPlayer.getReinforcement();
+				break;
+			}
+			case Phase.ATTACK : {
+				currentPlayer.updateAttackableMap();
+				break;
+			}
+			case Phase.FORTIFICATION : {
+				currentPlayer.updateReachableMap();
+				break;
+			}
+			default : {
+				break;
+			}
+		}
+		update();
+	}
+	
+	/**
+	 * Executes methods when it is turn to an AI player.
+	 */
+	private void AIMove() {
+		switch (phase.getCurrentPhase()) {
+			case Phase.STARTUP : {
+				currentPlayer.startup();
+				break;
+			}
+			case Phase.REINFORCEMENT : {
+				currentPlayer.reinforcement();
+				break;
+			}
+			case Phase.ATTACK : {
+				currentPlayer.attack();
+				
+				for (int i = 0; i < players.length; i++) {
+					if (players[i].getTotalArmy() == 0) {
+						if (playerQueue.contains(players[i])) {
+							playerNum--;
+							playerQueue.remove(players[i]);
+						}
+					}
+				}
+				
+				
+				if (playerQueue.size() == 1) {
+					winner = currentPlayer;
+					update();
+					return;
+				}
+				
+				break;
+		}
+			case Phase.FORTIFICATION : {
+				currentPlayer.fortification();
+				break;
+			}
+		}
+		
+		update();
+		nextPhase();
 	}
 	
 	/**
@@ -223,13 +362,12 @@ public class Game extends Observable{
 	 * @param territory the territory that is to be reinforced.
 	 * @param armyNum the number of armies to be added to a territory.
 	 */
-	public void reinforce(Territory territory, int armyNum) {
-		currentPlayer.reinforce(territory, armyNum);
+	public void placeUnassignedArmy(Territory territory, int armyNum) {
+		currentPlayer.placeUnassignedArmy(territory, armyNum);
 		if (currentPlayer.getUnassignedArmy() == 0) {
 			nextPhase();
 		}
-		setChanged();
-		notifyObservers();
+		update();
 	}
 	
 	/**
@@ -240,8 +378,7 @@ public class Game extends Observable{
 	public void setupAttack(Territory attacker, Territory defender) {
 		this.attacker = attacker;
 		this.defender = defender;
-		setChanged();
-		notifyObservers();
+		update();
 	}
 	
 	/**
@@ -266,8 +403,8 @@ public class Game extends Observable{
 	 * Otherwise, false.
 	 */
 	public boolean checkAttackPhase() {
-		for (String territory : currentPlayer.getAttackableMap().keySet()) {
-			if (!currentPlayer.getAttackableMap().get(territory).isEmpty()) {
+		for (LinkedList<Territory> attackableList : currentPlayer.getAttackableMap().values()) {
+			if (!attackableList.isEmpty()) {
 				return true;
 			}
 		}
@@ -281,77 +418,35 @@ public class Game extends Observable{
 	 * @param defenderDiceNum number of dice used by defender.
 	 */
 	public void attack(int attackerDiceNum, int defenderDiceNum) {
-		int attackerCasualties = 0;
-		int defenderCasualties = 0;
+		Player defendingPlayer= defender.getOwner();
 		
-		Player defenderPlayer = defender.getOwner();
-		
-		attackerDice = rollDice(attackerDiceNum);
-		defenderDice = rollDice(defenderDiceNum);
-	
-		PriorityQueue<Integer> attackerDiceCopy = new PriorityQueue<Integer>(Collections.reverseOrder());
-		attackerDiceCopy.addAll(attackerDice);
-		PriorityQueue<Integer> defenderDiceCopy = new PriorityQueue<Integer>(Collections.reverseOrder());
-		defenderDiceCopy.addAll(defenderDice);
-	
-		while (!attackerDiceCopy.isEmpty() && !defenderDiceCopy.isEmpty()) {
-			if (attackerDiceCopy.remove() > defenderDiceCopy.remove()) {
-				defenderCasualties++;
-			} 
-			else {
-				attackerCasualties++;
-			}
-		}
-		
-		currentPlayer.attack(attacker, defender, attackerCasualties, defenderCasualties);
+		currentPlayer.attack(attacker, defender, attackerDiceNum, defenderDiceNum);
+		attackerDice = currentPlayer.getDice();
+		defenderDice = defendingPlayer.getDice();
 		
 		if (defender.getOwner() == currentPlayer) {
 			attacker = null;
 			defender = null;
 		} else {
-			updateAttackableMap();
 			if (checkAttackPhase() == false) {
 				nextPhase();
 				return;
 			}
 		}
 		
-		if (defenderPlayer.getTotalArmy() == 0) {
-			int index = 0;
+		if (defendingPlayer.getTotalArmy() == 0) {
+			playerQueue.remove(defendingPlayer);
 			playerNum--;
-			Player[] newPlayers = new Player[playerNum];
-			
-			for (Player player : players) {
-				if (player != defenderPlayer) {
-					newPlayers[index++] = player;
-				}
-			}
-			players = newPlayers;
-			playerQueue.remove(defenderPlayer);
 		}
 		
-		setChanged();
-		notifyObservers();
+		update();
 		
 		if (players.length == 1) {
 			winner = currentPlayer;
 		}
 	}
 	
-	/**
-	 * Rolls some dice and returns the result.
-	 * @param diceNum the number of dice.
-	 * @return a priority queue contains the results of rolling.
-	 */
-	private PriorityQueue<Integer> rollDice(int diceNum) {
-		Random r = new Random();
-		PriorityQueue<Integer> dice = new PriorityQueue<Integer>();
-		for (int i = 0; i < diceNum; i++) {
-			dice.add(r.nextInt(6) + 1);
-		}
-		
-		return dice;
-	}
+
 
 	/**
 	 * Returns results of dice rolling by attacker.
@@ -369,43 +464,7 @@ public class Game extends Observable{
 		return defenderDice;
 	}
 	
-	/**
-	 * Updates the hash map containing all enemies' territories that the current
-	 * player can attack.
-	 */
-	public void updateAttackableMap() {
-		HashMap<String, LinkedList<Territory>> attackableMap = new HashMap<String, LinkedList<Territory>>();
 
-		for (Territory territory : currentPlayer.getTerritoryMap().values()) {
-			attackableMap.put(territory.getName(), getAttackableList(territory));
-		}
-
-		currentPlayer.updateAttackableMap(attackableMap);
-		setChanged();
-		notifyObservers();
-	}
-	
-	/**
-	 * Returns a list of territories which is able to be attacked by the given territory.
-	 * @param territory a list of territories which is able to be attacked by this territory
-	 * will be returned.
-	 * @return attackableList a list of territories which is able to be attacked by the 
-	 * given territory.
-	 */
-	private LinkedList<Territory> getAttackableList(Territory territory) {
-		LinkedList<Territory> attackableList = new LinkedList<Territory>();
-		HashMap<String, LinkedList<String>> edgeMap = map.getEdgeMap();
-		
-		if (territory.getArmy() > 1) {
-			for (String adjacent : edgeMap.get(territory.getName())) {
-				Territory adjacentTerritory = map.getTerritoryMap().get(adjacent);
-				if (!currentPlayer.getTerritoryMap().containsKey(adjacentTerritory.getName())) {
-					attackableList.add(map.getTerritoryMap().get(adjacent));
-				}
-			}	
-		}
-		return attackableList;
-	}
 	
 	/**
 	 * Moves armies from the attacking territory to the recently conquered territory.
@@ -415,9 +474,8 @@ public class Game extends Observable{
 	 * to the conquered territory.
 	 */
 	public void conquer(Territory attacker, Territory defender, int armyNum) {
-		currentPlayer.addArmy(defender.getName(), armyNum);
-		currentPlayer.removeArmy(attacker.getName(), armyNum);
-		updateAttackableMap();
+		currentPlayer.moveArmy(attacker, defender, armyNum);		
+		update();
 		
 		if (checkAttackPhase() == false) {
 			nextPhase();
@@ -432,60 +490,10 @@ public class Game extends Observable{
 	 */
 	public void fortify(Territory departureTerritory, Territory arrivalTerritory, int armyNum) {
 		currentPlayer.fortify(departureTerritory, arrivalTerritory, armyNum);
-		setChanged();
-		notifyObservers();
+		update();
 	}
 	
-	/**
-	 * Update the hash map contains all territories which is able to be connected
-	 * to a territory by a path.
-	 */
-	public void updateReachableMap() {
-		HashMap<String, LinkedList<Territory>> reachableMap = new HashMap<String, LinkedList<Territory>>();
-		
-		for (Territory territory : map.getTerritoryMap().values()) {
-			reachableMap.put(territory.getName(), getReachableList(territory));
-		}
-		
-		currentPlayer.updateReachableMap(reachableMap);
-	}
-	
-	/**
-	 * Returns a list of territories which are able to be connected by the given territory by a path.
-	 * @param territory a list of territories which are able to be connected by this territory by a path
-	 * will be returned.
-	 * @return reachableList a list of territories which are able to be connected by the given 
-	 * territory by a path.
-	 */
-	private LinkedList<Territory> getReachableList(Territory territory) {
-		LinkedList<Territory> reachableList = new LinkedList<Territory>();
-		Stack<Territory> stack = new Stack<Territory>();
-		HashMap<String, LinkedList<String>> edgeMap = map.getEdgeMap();
-		HashMap<String, Territory> territoryMap = currentPlayer.getTerritoryMap();
-		
-		if (territory.getArmy() > 1) {
-			for (String adjacent : edgeMap.get(territory.getName())){
-				if (territoryMap.containsKey(adjacent)) {
-					stack.push(territoryMap.get(adjacent));
-				}
-			}
-		
-			while (!stack.isEmpty()) {
-				Territory currentTerritory = stack.pop();
-				reachableList.add(currentTerritory);
-			
-				for (String adjacent : edgeMap.get(currentTerritory.getName())){
-					if (territoryMap.containsKey(adjacent)) {
-						if (!adjacent.equals(territory.getName()) && !reachableList.contains(territoryMap.get(adjacent))) {
-							stack.push(territoryMap.get(adjacent));
-						}
-					}
-				}
-			}
-		}
-		
-		return reachableList;
-	}
+
 	
 	/**
 	 * The current player exchanges a set of cards and receives bonus armies.
@@ -494,8 +502,7 @@ public class Game extends Observable{
 	public void exchangeCards(LinkedList<Integer> cards) {
 		currentPlayer.exchangeCards(cards, exchangeBonusArmy);
 		exchangeBonusArmy += 5;
-		setChanged();
-		notifyObservers();
+		update();
 	}
 	
 	/**
@@ -504,5 +511,12 @@ public class Game extends Observable{
 	 */
 	public int getExchangeBonusArmy() {
 		return exchangeBonusArmy;
+	}
+	
+	/**
+	 * Load the game.
+	 */
+	public void load() {
+		update();
 	}
 }
