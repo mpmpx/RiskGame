@@ -4,15 +4,18 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -36,8 +39,8 @@ public class MapDisplayPanel extends JPanel implements Observer{
 	private BufferedImage image;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<Point, Territory> locationMap;
-	private HashMap<String, LinkedList<Territory>> reachableMap;	
-	private HashMap<String, LinkedList<Territory>> attackableMap;
+	private HashMap<Territory, LinkedList<Territory>> reachableMap;	
+	private HashMap<Territory, LinkedList<Territory>> attackableMap;
 	
 	
 	/**
@@ -65,7 +68,20 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			locationMap.put(territory.getLocation(), territory);
 		}
 		
-		image = map.getImage();
+		try {
+			image = ImageIO.read(new File(map.getImagePath()));
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// Change the color model of the image to accommodate all colors.
+	    BufferedImage newImage= new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+	    Graphics2D g2d= newImage.createGraphics();
+	    g2d.drawImage(image, 0, 0, null);
+	    g2d.dispose();
+	    image = newImage;
+	    
 		setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 		
 		paintImage();
@@ -105,6 +121,11 @@ public class MapDisplayPanel extends JPanel implements Observer{
 			}
 		} 
 		repaint();
+		
+		if (module.getPlayerNum() == 1) {
+			JOptionPane.showMessageDialog(null, currentPlayer.getName() + " won the game.");
+			//System.exit(0);
+		}
 	}
 	/**
 	 * Method to paint the image
@@ -219,7 +240,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				
 				int result = JOptionPane.showConfirmDialog(null, message, "Set armies", JOptionPane.OK_CANCEL_OPTION);
 				if (result == JOptionPane.OK_OPTION) {
-					module.reinforce(territory, (int) spinner.getValue());
+					module.placeUnassignedArmy(territory, (int) spinner.getValue());
 					return;
 				}
 				else {
@@ -248,7 +269,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 					if (currentPlayer.getTerritoryMap().containsValue(territory)) {
 						
 						// Territory with only one army or without adjacent enemy's territory is not able to be selected.
-						if (territory.getArmy() == 1 || attackableMap.get(territory.getName()).isEmpty()) {
+						if (territory.getArmy() == 1 || attackableMap.get(territory).isEmpty()) {
 							return;
 						} 
 					
@@ -260,7 +281,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				// Select defender territory
 				else if (defenderTerritory == null) {
 					// Click on an territory which cannot be attacked by attacker territory.
-					if (!attackableMap.get(attackerTerritory.getName()).contains(territory)) {
+					if (!attackableMap.get(attackerTerritory).contains(territory)) {
 						attackerTerritory = null;
 						paintImage();
 						repaint();
@@ -299,7 +320,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				if (selectedTerritory == null) {
 				    // Territory with only one army is not able to be selected.
 					// Territory with no reachable territories is not able to be selected.
-					if (territory.getArmy() == 1 || reachableMap.get(territory.getName()).isEmpty()) {
+					if (territory.getArmy() == 1 || reachableMap.get(territory).isEmpty()) {
 						return;
 					}
 					
@@ -311,7 +332,7 @@ public class MapDisplayPanel extends JPanel implements Observer{
 				else {
 					
 					// if select departure country itself.
-					if (selectedTerritory == territory || !reachableMap.get(selectedTerritory.getName()).contains(territory)) {
+					if (selectedTerritory == territory || !reachableMap.get(selectedTerritory).contains(territory)) {
 						selectedTerritory = null;
 						paintImage();
 						repaint();

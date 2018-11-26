@@ -59,7 +59,7 @@ public class DominationView extends JPanel implements Observer{
 			Border colorBorder = BorderFactory.createLineBorder(player.getColor(), 2);
 			
 			String content = "";
-			content += player.getName() + ":\n";
+			content += player.getName() + " (" + player.getStrategy().getBehavior() + ") :\n";
 			content += ("Map controlled: " + 
 					player.getTerritoryMap().size() * 100 / map.getTerritoryMap().size() + "%\n");
 			
