@@ -1,6 +1,6 @@
 package risk.game;
 
-import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -9,12 +9,12 @@ import java.util.LinkedList;
  * all continents, territories and links.
  */
 
-public class RiskMap {
+public class RiskMap implements Serializable{
 	public final static int MAX_CONTINENT = 32;
 	public final static int MAX_COUNTRY = 255;
 	public final static int MAX_ADJACENT_COUNTRIES = 10;
 	
-	private BufferedImage image;
+	private String imagePath;
 	private HashMap<String, Continent> continentMap;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<String, LinkedList<String>> edgeMap;
@@ -24,7 +24,6 @@ public class RiskMap {
 	 * 
 	 */
 	public RiskMap() {
-		image = null;
 		continentMap = new HashMap<String, Continent>();
 		territoryMap = new HashMap<String, Territory>();
 		edgeMap = new HashMap<String, LinkedList<String>>();
@@ -34,26 +33,36 @@ public class RiskMap {
 	 * Clears all variables of the class.
 	 */
 	public void clear() {
-		image = null;
 		continentMap.clear();
 		territoryMap.clear();
 		edgeMap.clear();
 	}
 	
 	/**
-	 * Sets the image of the map.
-	 * @param image an image that is to be the map's image.
+	 * Resets the territory.
 	 */
-	public void setImage(BufferedImage image) {
-		this.image = image;
+	public void reset() {
+		for (Territory territory : territoryMap.values()) {
+			territory.setOwner(null);
+			territory.setColor(null);
+			territory.setArmy(0);
+		}
 	}
 	
 	/**
-	 * Returns the image.
-	 * @return The image.
+	 * Sets the image of the map.
+	 * @param imagePath the path of the image file.
 	 */
-	public BufferedImage getImage() {
-		return image;
+	public void setImage(String imagePath) {
+		this.imagePath = imagePath;
+	}
+	
+	/**
+	 * Returns the path of map image.
+	 * @return the path of map image.
+	 */
+	public String getImagePath() {
+		return imagePath;
 	}
 	
 	/**
