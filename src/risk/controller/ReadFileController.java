@@ -1,6 +1,5 @@
 package risk.controller;
 
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -25,7 +24,6 @@ public class ReadFileController {
 	private HashMap<String, Continent> continentMap;
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<String, LinkedList<String>> edgeMap;
-	private String imagePath;
 	private BufferedImage image;
 	private String label;
 	
@@ -224,9 +222,7 @@ public class ReadFileController {
     				if (currentLocation.y > 0 && currentLocation.y < image.getHeight()) {
     					if (visited.get(currentLocation) == null || visited.get(currentLocation) != true) {
     						shape.add(currentLocation);
-    						visited.put(currentLocation, true);
-    						//System.out.println(currentLocation.x + " " + currentLocation.y);
-    					
+    						visited.put(currentLocation, true);    					
     					
     		    			stack.push(new Point(currentLocation.x + 1, currentLocation.y));
     		    			stack.push(new Point(currentLocation.x - 1, currentLocation.y));
@@ -269,20 +265,15 @@ public class ReadFileController {
                     case "[Map]": {
                     	String[] token = line.split("=");
                     	if (token[0].equals("image")) {
-                			imagePath = new File(file.getParent(), token[1]).getPath();
+                			File imageFile = new File(file.getParent(), token[1]);
                     		try {
-								image = ImageIO.read(new File(imagePath));
+								image = ImageIO.read(imageFile);
 							
                     		} catch (Exception e) {
 								e.printStackTrace();
 							}
                     		
-                    		// Change the color model of the image to accommodate all colors.
-                    	    BufferedImage newImage= new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                    	    Graphics2D g2d= newImage.createGraphics();
-                    	    g2d.drawImage(image, 0, 0, null);
-                    	    g2d.dispose();
-                    		map.setImage(newImage);
+                    		map.setImage(imageFile.getPath());
                     	}
                     	
                     	bMap = true;
@@ -323,6 +314,13 @@ public class ReadFileController {
 
         });
         bufferedReader.close();
+        
+        for (String territory : edgeMap.keySet()) {
+        	Territory currentTerritory = territoryMap.get(territory);
+        	for (String adjacent : edgeMap.get(territory)) {
+        		currentTerritory.addAdjacent(territoryMap.get(adjacent));
+        	}
+        }
         
         // Map validation.
         validateBlockName();

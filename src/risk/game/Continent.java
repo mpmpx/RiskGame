@@ -1,5 +1,6 @@
 package risk.game;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -7,7 +8,7 @@ import java.util.LinkedList;
  * This class defines a continent which contains its name, continent value
  * and all territories which belong to it.
  */
-public class Continent {
+public class Continent implements Serializable{
 
 	private String name;
 	private int value;
