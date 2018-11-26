@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import risk.game.*;
+import risk.game.strategy.Strategy.Behavior;
 
 /**
  * This is a GUI which displays hand cards of current playing player and provides interaction methods 
@@ -86,7 +87,7 @@ public class CardExchangeView extends JPanel implements Observer {
 		exchangeBonusArmy = obs.getExchangeBonusArmy();
 		updateView();
 		
-		if (cards.getSize() >= 5 && !getRootPane().getParent().isVisible()) {
+		if (cards.getSize() >= 5 && !getRootPane().getParent().isVisible() && currentPlayer.getStrategy().getBehavior() == Behavior.HUMAN) {
 			getRootPane().getParent().setVisible(true);
 		}
 	}

@@ -5,7 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -14,6 +14,7 @@ import java.util.PriorityQueue;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,9 +22,10 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
-import java.awt.CardLayout;
-
+import risk.controller.SaveLoadGameController;
 import risk.game.*;
 /**
  * This class is the GUI for the Phase View Panel, showing the current phase of
@@ -38,6 +40,7 @@ public class PhaseView extends JPanel implements Observer{
 	
 	private CardExchangeView cardExchangeView;
 	private JButton nextButton;
+	private JButton saveButton;
 	private Player currentPlayer;
 	private JLabel remainingArmyLabel;
 	private JLabel reinforcementInfo;
@@ -58,6 +61,7 @@ public class PhaseView extends JPanel implements Observer{
 		setLayout(new GridBagLayout());
 		
 		nextButton = new JButton("Next");
+		saveButton = new JButton("Save");
 		remainingArmyLabel = new JLabel();
 		reinforcementInfo = new JLabel();
 		attackerLabel = new JLabel();
@@ -72,7 +76,8 @@ public class PhaseView extends JPanel implements Observer{
 		defender = null;
 		
 		setPreferredSize(new Dimension(MainFrame.WIDTH, MainFrame.HEIGHT * 2 / 10));
-		nextButton.addActionListener(new ButtonListener());
+		nextButton.addActionListener(new NextButtonListener());
+		saveButton.addActionListener(new SaveButtonListener());
 	}
 
 	/**
@@ -231,11 +236,13 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridy = 1;
 		add(exchangeButton, c);
 		
+		c.gridx = 0;
+		c.gridy = 2;
+		add(saveButton, c);
+		
 		c.gridx = 1;
 		c.gridy = 2;
 		add(nextButton, c);
-		
-
 	}
 	/**
 	 * Method to update the attack phase view
@@ -258,10 +265,8 @@ public class PhaseView extends JPanel implements Observer{
 		String attackerDiceResult = "<html>";
 		String defenderDiceResult = "<html>";
 		
-		PriorityQueue<Integer> attackerDice = new PriorityQueue<Integer>(Collections.reverseOrder());
-		attackerDice.addAll(module.getAttackerDice());
-		PriorityQueue<Integer> defenderDice = new PriorityQueue<Integer>(Collections.reverseOrder());
-		defenderDice.addAll(module.getDefenderDice());
+		PriorityQueue<Integer> attackerDice = module.getAttackerDice();
+		PriorityQueue<Integer> defenderDice = module.getDefenderDice();
 		
 		while (!attackerDice.isEmpty() && !defenderDice.isEmpty()) {
 			if (attackerDice.peek() > defenderDice.peek()) {
@@ -384,8 +389,13 @@ public class PhaseView extends JPanel implements Observer{
 		
 		c.weightx = 0;
 		c.weighty = 0;
-		c.anchor = GridBagConstraints.LAST_LINE_END;
+		c.anchor = GridBagConstraints.FIRST_LINE_START;
 		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 3;
+		add(saveButton, c);
+		
+		c.anchor = GridBagConstraints.LAST_LINE_END;
 		c.gridx = 3;
 		c.gridy = 3;
 		add(nextButton, c);
@@ -414,9 +424,13 @@ public class PhaseView extends JPanel implements Observer{
 		c.gridwidth = 1;
 		c.weightx = 0;
 		c.weighty = 0;
+		c.gridx = 0;
+		c.gridy = 1;
+		add(saveButton, c);	
+	
 		c.gridx = 1;
 		c.gridy = 1;
-		add(nextButton, c);		
+		add(nextButton, c);
 	}
 
 	
@@ -479,17 +493,12 @@ public class PhaseView extends JPanel implements Observer{
 					module.conquer(attackerCopy, defenderCopy, (int) spinner.getValue());
 				}
 			}
-			
-			if (currentPlayer.getTerritoryMap().size() == module.getMap().getTerritoryMap().size()) {
-				JOptionPane.showMessageDialog(null, currentPlayer.getName() + " won the game.");
-				System.exit(0);
-			}
 		}
 	}
 	/**
 	 * Method add button listener
 	 */
-	private class ButtonListener implements ActionListener {
+	private class NextButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -540,5 +549,28 @@ public class PhaseView extends JPanel implements Observer{
 		
 	}
 
+	private class SaveButtonListener implements ActionListener {
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			SaveLoadGameController controller = new SaveLoadGameController();
+					 
+			JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+			fileChooser.setDialogTitle("Specify a file to save");   
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(".save file", "save");
+			fileChooser.addChoosableFileFilter(filter);
+			
+			int userSelection = fileChooser.showSaveDialog(null);
+			 
+			if (userSelection == JFileChooser.APPROVE_OPTION) {
+			    File fileToSave = fileChooser.getSelectedFile();
+			    controller.saveGame(fileToSave.getPath(), module);
+			    
+			    JOptionPane.showMessageDialog(null, "You have successfully saved the game as " + fileToSave.getName());
+			}
+			
+		}
+		
+	}
 }

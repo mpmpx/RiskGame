@@ -24,7 +24,5 @@ public class StartController {
 		frame.addPanel(gamePanel, MainFrame.GAME_PANEL);
 		frame.setCurrentPanel(MainFrame.MENU_PANEL);
 		
-		
-		
 	}
 }
