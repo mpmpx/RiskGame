@@ -2,18 +2,27 @@ package risk.game;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.Stack;
+
+import risk.game.strategy.Strategy;
 
 /**
  * This class maintains all of the data and functionality that a player would
  * have. 
  */
-public class Player{
-
+public class Player implements Serializable {
+	
 	private String name;
 	private Color color;
 	private Cards cards;
+	private Strategy strategy;
 	
 	private HashMap<String, Territory> territoryMap;
 	private HashMap<Continent, Boolean> controlledContinent;
@@ -22,14 +31,14 @@ public class Player{
 	private int unassignedArmy;
 	private int freeArmy;
 	
-	private HashMap<String, LinkedList<Territory>> attackableMap;
-	private HashMap<String, LinkedList<Territory>> reachableMap;
+	private HashMap<Territory, LinkedList<Territory>> attackableMap;
+	private HashMap<Territory, LinkedList<Territory>> reachableMap;
+	private PriorityQueue<Integer> dice;
 	
 	private boolean hasConquered;
 	
 	/**
-	 * Creates a player with name.
-	 * 
+	 * Creates a player and set a string as its name.
 	 * @param name a string that is to be the player's name.
 	 */
 	public Player(String name) {
@@ -38,8 +47,9 @@ public class Player{
 		cards = new Cards();
 		territoryMap = new HashMap<String, Territory>();
 		controlledContinent = new HashMap<Continent, Boolean>();
-		reachableMap = new HashMap<String, LinkedList<Territory>>();
-		attackableMap = new HashMap<String, LinkedList<Territory>>();
+		reachableMap = new HashMap<Territory, LinkedList<Territory>>();
+		attackableMap = new HashMap<Territory, LinkedList<Territory>>();
+		dice = new PriorityQueue<Integer>(Collections.reverseOrder());
 		ownedTerritoryNum = 0;
 		totalArmy = 0;
 		unassignedArmy = 0;
@@ -47,6 +57,22 @@ public class Player{
 		hasConquered = false;
 	}
 
+	/**
+	 * Sets the type of strategy to this player.
+	 * @param strategy a strategy that is to be the strategy of this player.
+	 */
+	public void setStrategy(Strategy strategy) {
+		this.strategy = strategy;
+	}
+	
+	/**
+	 * Returns the strategy of this player.
+	 * @return the strategy of this player.
+	 */
+	public Strategy getStrategy() {
+		return strategy;
+	}
+	
 	/**
 	 * Sets the color which represents this player.
 	 * @param color the color which represents this player.
@@ -92,10 +118,34 @@ public class Player{
 	public void setUnsignedArmy(int army) {
 		unassignedArmy = army;
 		totalArmy += army;
-		for (Territory territory : territoryMap.values()) {
-			territory.addArmy(1);
-			totalArmy++;
-		}
+	}
+	
+	/**
+	 * Uses the startup strategy.
+	 */
+	public void startup() {
+		strategy.startup();
+	}
+	
+	/**
+	 * Uses the reinforcement strategy.
+	 */
+	public void reinforcement() {
+		strategy.reinforce();
+	}
+	
+	/**
+	 * Uses the attack strategy.
+	 */
+	public void attack() {
+		strategy.attack();
+	}
+	
+	/**
+	 * Uses the fortification strategy.
+	 */
+	public void fortification() {
+		strategy.fortify();
 	}
 	
 	/**
@@ -119,51 +169,92 @@ public class Player{
 	}
 	
 	/**
-	 * Reinforces armies to the given territory.
+	 * Places unassigned armies to the given territory.
 	 * @param territory the territory that is to be reinforced by armies.
 	 * @param armyNum the number of armies that is to be assigned to the given
 	 * territory.
 	 */
-	public void reinforce(Territory territory, int armyNum) {
+	public void placeUnassignedArmy(Territory territory, int armyNum) {
 		territory.addArmy(armyNum);
 		unassignedArmy -= armyNum;
 	}
 
 	/**
-	 * Update attackable hash map.
-	 * @param attackableMap the hash map that is to be updated.
+	 * Updates the hash map containing all enemies' territories that the current
+	 * player can attack.
 	 */
-	public void updateAttackableMap(HashMap<String, LinkedList<Territory>> attackableMap) {
-		this.attackableMap = attackableMap;
+	public void updateAttackableMap() {
+		attackableMap = new HashMap<Territory, LinkedList<Territory>>();
+
+		for (Territory territory : territoryMap.values()) {
+			attackableMap.put(territory, getAttackableList(territory));
+		}
+	}
+	
+	/**
+	 * Returns a list of territories which is able to be attacked by the given territory.
+	 * @param territory a list of territories which is able to be attacked by this territory
+	 * will be returned.
+	 * @return attackableList a list of territories which is able to be attacked by the 
+	 * given territory.
+	 */
+	private LinkedList<Territory> getAttackableList(Territory territory) {
+		LinkedList<Territory> attackableList = new LinkedList<Territory>();
+		
+		if (territory.getArmy() > 1) {
+			for (Territory adjacent : territory.getAdjacent().values()) {
+				if (!territoryMap.values().contains(adjacent)) {
+					attackableList.add(adjacent);
+				}
+			}	
+		}
+		return attackableList;
 	}
 	
 	/**
 	 * Returns attackable hash map.
 	 * @return attackable hash map.
 	 */
-	public HashMap<String, LinkedList<Territory>> getAttackableMap() {
+	public HashMap<Territory, LinkedList<Territory>> getAttackableMap() {
 		return attackableMap;
 	}
 	
 	/**
 	 * Attacks a territory of enemy by one of territory.
-	 * @param attacker the attacking territory.
-	 * @param defender the enemy's attacked territory.
-	 * @param attackerCasualties attacker's casualties.
-	 * @param defenderCasualties defender's casualties.
+	 * @param attackingTerritory the attacking territory.
+	 * @param defendingTerritory the enemy's attacked territory.
+	 * @param attackerDiceNum number of dice the attacker used.
+	 * @param defenderDiceNum number of dice the defender used.
 	 */
-	public void attack(Territory attacker, Territory defender, int attackerCasualties, int defenderCasualties) {
-		killArmy(attacker.getName(), attackerCasualties);		
-		defender.getOwner().killArmy(defender.getName(), defenderCasualties);
+	public void attack(Territory attackingTerritory, Territory defendingTerritory, int attackerDiceNum, int defenderDiceNum) {
+		Player attacker = this;
+		Player defender = defendingTerritory.getOwner();
 		
-		if (defender.getArmy() == 0) {
-			defender.getOwner().removeTerritory(defender);
-			defender.setColor(color);
-			defender.setOwner(this);
-			addTerritory(defender);
+		attacker.rollDice(attackerDiceNum);
+		defender.rollDice(defenderDiceNum);
+
+		PriorityQueue<Integer> attackerDice = new PriorityQueue<Integer> (attacker.getDice());
+		PriorityQueue<Integer> defenderDice = new PriorityQueue<Integer> (defender.getDice());
+		
+		while (!attackerDice.isEmpty() && !defenderDice.isEmpty()) {
+			if (attackerDice.remove() > defenderDice.remove()) {
+				defender.removeArmy(defendingTerritory.getName(), 1);
+			}
+			else {
+				attacker.removeArmy(attackingTerritory.getName(), 1);
+			}
+		}
+		
+		
+		if (defendingTerritory.getArmy() == 0) {
+			defender.removeTerritory(defendingTerritory);
+			defendingTerritory.setOwner(attacker);
+			defendingTerritory.setColor(attacker.getColor());
+			attacker.addTerritory(defendingTerritory);
 			hasConquered = true;
 		}
 		
+		updateAttackableMap();
 	}
 	
 	/**
@@ -171,7 +262,6 @@ public class Player{
 	 */
 	private void updateControlledContinent() {
 		LinkedList<String> territoryList = new LinkedList<String>();
-		controlledContinent.clear();
 		
 		for (Territory territory : territoryMap.values()) {
 			territoryList.add(territory.getName());
@@ -185,31 +275,69 @@ public class Player{
 	}
 	
 	/**
-	 * Update the reachable hash map.
-	 * @param reachableMap the reachable hash map.
+	 * Update the hash map contains all territories which is able to be connected
+	 * to a territory by a path.
 	 */
-	public void updateReachableMap(HashMap<String, LinkedList<Territory>> reachableMap) {
-		this.reachableMap = reachableMap;
+	public void updateReachableMap() {
+		reachableMap = new HashMap<Territory, LinkedList<Territory>>();
+		
+		for (Territory territory : territoryMap.values()) {
+			reachableMap.put(territory, getReachableList(territory));
+		}		
+	}
+	
+	/**
+	 * Returns a list of territories which are able to be connected by the given territory by a path.
+	 * @param territory a list of territories which are able to be connected by this territory by a path
+	 * will be returned.
+	 * @return reachableList a list of territories which are able to be connected by the given 
+	 * territory by a path.
+	 */
+	private LinkedList<Territory> getReachableList(Territory territory) {
+		LinkedList<Territory> reachableList = new LinkedList<Territory>();
+		Stack<Territory> stack = new Stack<Territory>();
+		
+		if (territory.getArmy() > 1) {
+			for (Territory adjacent : territory.getAdjacent().values()){
+				if (territoryMap.containsValue(adjacent)) {
+					stack.push(adjacent);
+				}
+			}
+		
+			while (!stack.isEmpty()) {
+				Territory currentTerritory = stack.pop();
+				reachableList.add(currentTerritory);
+			
+				for (Territory adjacent : currentTerritory.getAdjacent().values()){
+					if (territoryMap.containsValue(adjacent)) {
+						if (adjacent != territory && !reachableList.contains(adjacent)) {
+							stack.push(adjacent);
+						}
+					}
+				}
+			}
+		}
+		
+		return reachableList;
 	}
 
 	/**
 	 * Returns the reachable hash map.
 	 * @return the reachable hash map.
 	 */
-	public HashMap<String, LinkedList<Territory>> getReachableMap() {
+	public HashMap<Territory, LinkedList<Territory>> getReachableMap() {
 		return reachableMap;
 	}
 	
 	/**
 	 * Moves armies from one territory to another one in fortification phase.
-	 * @param departureTerritory moves armies from this territory.
-	 * @param arrivalTerritory moves armies to this territory.
+	 * @param start moves armies from this territory.
+	 * @param dest moves armies to this territory.
 	 * @param armyNum the number of armies that are to be moved.
 	 */
-	public void fortify(Territory departureTerritory, Territory arrivalTerritory, int armyNum) {
-		departureTerritory.removeArmy(armyNum);
-		arrivalTerritory.addArmy(armyNum);
-
+	public void fortify(Territory start, Territory dest, int armyNum) {
+		moveArmy(start, dest, armyNum);
+		
 		if (hasConquered) {
 			cards.getCard();
 			hasConquered = false;
@@ -223,6 +351,7 @@ public class Player{
 	 */
 	public void addTerritory(Territory territory) {
 		territoryMap.put(territory.getName(), territory);
+		totalArmy += territory.getArmy();
 		ownedTerritoryNum++;
 		updateControlledContinent();
 	}
@@ -295,33 +424,27 @@ public class Player{
 	}
 	
 	/**
-	 * Adds armies to a territory.
-	 * @param territory the territory that adds some armies.
-	 * @param armyNum the number of armies that are to be added to the given territory.
-	 */
-	public void addArmy(String territory, int armyNum) {
-		territoryMap.get(territory).addArmy(armyNum);
-		unassignedArmy -= armyNum;
-	}
-	
-	/**
 	 * Removes armies from a territory.
 	 * @param territory the territory which removes some armies.
 	 * @param armyNum the number of armies that are to be removed from the given territory.
 	 */
 	public void removeArmy(String territory, int armyNum) {
 		territoryMap.get(territory).removeArmy(armyNum);
+		totalArmy -= armyNum;
 	}
 	
 	/**
-	 * Removes armies from a territory and deducts the total armies.
-	 * @param territory the territory that removes armies.
-	 * @param army the number of armies that are to be removed from the given territory.
+	 * Moves armies from one territory to another territory.
+	 * @param start moves armies from this territory.
+	 * @param dest moves armies to this territory.
+	 * @param armyNum number of armies to be moved.
 	 */
-	public void killArmy(String territory, int army) {
-		territoryMap.get(territory).removeArmy(army);
-		totalArmy -= army;
+	public void moveArmy(Territory start, Territory dest, int armyNum) {
+		start.removeArmy(armyNum);
+		dest.addArmy(armyNum);
+		updateAttackableMap();
 	}
+	
 	
 	/**
 	 * Exchange hand cards and receives bonus armies.
@@ -351,4 +474,93 @@ public class Player{
 		}
 		hasConquered = false;
 	}
+	
+	/**
+	 * Rolls some dice and returns the result.
+	 * @param diceNum the number of dice.
+	 */
+	private void rollDice(int diceNum) {
+		dice.clear();
+		Random r = new Random();
+		for (int i = 0; i < diceNum; i++) {
+			dice.add(r.nextInt(6) + 1);
+		}
+		
+	}
+	
+	/**
+	 * Returns results of dice rolling by attacker.
+	 * @return results of dice rolling by attacker.
+	 */
+	public PriorityQueue<Integer> getDice() {
+		return dice;
+	}
+	
+	/**
+	 * Returns a random territory from a list of territories.
+	 * @param territories a list of territories.
+	 * @return a random territory from a list of territories.
+	 */
+	public Territory getRandomTerritory(ArrayList<Territory> territories) {
+		Random r = new Random();
+		if (territories.size() == 0) {
+			return null;
+		}
+		
+		return territories.get(r.nextInt(territories.size()));
+	}
+	
+	/**
+	 * Returns a random territory.
+	 * @return a random territory.
+	 */
+	public Territory getRandomTerritory() {
+		ArrayList<Territory> territoryArray = new ArrayList<Territory> (territoryMap.values());
+		Random r = new Random();
+		
+		return territoryArray.get(r.nextInt(territoryArray.size()));
+	}
+	
+	/**
+	 * Returns the strongest territory of the player.
+	 * @return the strongest territory of the player.
+	 */
+	public Territory getStrongestTerritory() {
+		Territory strongestTerritory = null;
+		
+		for (Territory territory : territoryMap.values()) {
+			if (strongestTerritory == null) {
+				strongestTerritory = territory;
+			}
+			
+			if (territory.getArmy() > strongestTerritory.getArmy()) {
+				strongestTerritory = territory;
+			}
+		}
+		
+		
+		return strongestTerritory;
+	}
+	
+	/**
+	 * Returns the weakest territory of the player.
+	 * @return the weakest territory of the player.
+	 */
+	public Territory getWeakestTerritory() {
+		Territory weakestTerritory = null;
+		
+		for (Territory territory : territoryMap.values()) {
+			if (weakestTerritory == null) {
+				weakestTerritory = territory;
+			}
+			
+			if (territory.getArmy() < weakestTerritory.getArmy()) {
+				weakestTerritory = territory;
+			}
+		}
+		
+		
+		return weakestTerritory;
+	}
+	
 }
