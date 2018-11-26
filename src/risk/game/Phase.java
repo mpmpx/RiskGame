@@ -1,9 +1,11 @@
 package risk.game;
 
+import java.io.Serializable;
+
 /**
  * This class maintains status of current phase.
  */
-public class Phase {
+public class Phase implements Serializable{
 
 	public final static int STARTUP = -1;
 	public final static int REINFORCEMENT = 0;

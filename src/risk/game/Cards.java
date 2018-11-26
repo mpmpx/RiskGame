@@ -1,13 +1,15 @@
 package risk.game;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Random;
 
 /**
  * This class defines the hand cards of a player.
  */
-public class Cards {
+public class Cards implements Serializable{
 
+	public static int exchangeArmy = 5;
 	public final static int INFANTRY = 0;
 	public final static int CAVALRY = 1;
 	public final static int CANNON = 2;
