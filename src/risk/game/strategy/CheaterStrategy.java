@@ -5,17 +5,25 @@ import java.util.LinkedList;
 
 import risk.game.Player;
 import risk.game.Territory;
-
+/**
+ * The Cheater Strategy that implements strategy and serializable operation
+ */
 public class CheaterStrategy implements Strategy, Serializable {
 	
 	private Player player;
 	private Behavior behavior;
-	
+	/**
+ 	 * Constructor for CheaterStrategy
+ 	 * @param player
+ 	 *            the desired player the user want to use
+ 	 */
 	public CheaterStrategy(Player player) {
 		this.player = player;
 		behavior = Behavior.CHEATER;
 	}
-	
+	/**
+	 * Method to startup
+	 */
 	@Override
 	public void startup() {
 		while (player.getUnassignedArmy() != 0) {
@@ -23,7 +31,9 @@ public class CheaterStrategy implements Strategy, Serializable {
 			player.placeUnassignedArmy(randomTerritory, 1);
 		}
 	}
-
+	/**
+	 * Method to reinforce.
+	 */
 	@Override
 	public void reinforce() {
 		for (Territory territory : player.getTerritoryMap().values()) {
@@ -31,7 +41,9 @@ public class CheaterStrategy implements Strategy, Serializable {
 			player.placeUnassignedArmy(territory, player.getUnassignedArmy());
 		}
 	}
-
+	/**
+	 * Method to attack
+	 */
 	@Override
 	public void attack() {
 		player.updateAttackableMap();
@@ -48,7 +60,9 @@ public class CheaterStrategy implements Strategy, Serializable {
 			}
 		}
 	}
-
+	/**
+	 * Method to fortify
+	 */
 	@Override
 	public void fortify() {
 		player.updateAttackableMap();
@@ -62,7 +76,11 @@ public class CheaterStrategy implements Strategy, Serializable {
 			}
 		}
 	}
-
+	/**
+  	* Method to get its behavior
+ 	 * 
+ 	 * @return the behavior in Behavior type
+ 	 */
 	@Override
 	public Behavior getBehavior() {
 		return behavior;
