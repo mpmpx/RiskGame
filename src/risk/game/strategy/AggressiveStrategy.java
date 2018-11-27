@@ -8,17 +8,25 @@ import java.util.Random;
 import risk.game.Cards;
 import risk.game.Player;
 import risk.game.Territory;
-
+/**
+ * An Aggressive Strategy that implements strategy and serializable operation
+ */
 public class AggressiveStrategy implements Strategy , Serializable{
 
 	private Player player;
 	private Behavior behavior;
-	
+	/**
+	 * Constructor of AggressiveStratege
+	 * @param Player 
+	 *		the player to use strategy
+	 */
 	public AggressiveStrategy(Player player) {
 		this.player = player;
 		behavior = Behavior.AGGRESSIVE;
 	}
-	
+	/**
+	 * Method to startup 
+	 */
 	@Override
 	public void startup() {
 		for (Territory territory : player.getTerritoryMap().values()) {
@@ -31,7 +39,9 @@ public class AggressiveStrategy implements Strategy , Serializable{
 		}
 		
 	}
-
+	/**
+	 * Method to reinforce.
+	 */
 	@Override
 	public void reinforce() {
 		Territory strongestTerritory = player.getStrongestTerritory();
@@ -56,6 +66,9 @@ public class AggressiveStrategy implements Strategy , Serializable{
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Method to attack.
+	 */
 	@Override
 	public void attack() {
 		Territory strongestTerritory = player.getStrongestTerritory();
@@ -83,7 +96,9 @@ public class AggressiveStrategy implements Strategy , Serializable{
 		}
 		
 	}
-
+	/**
+	 * Method to fortify
+	 */
 	@Override
 	public void fortify() {
 		player.updateReachableMap();
@@ -110,7 +125,11 @@ public class AggressiveStrategy implements Strategy , Serializable{
 		
 	}
 	
-
+	/**
+	 * Method to get its behavior
+	 * 
+	 * @return the behavior that got which is Behavior type
+	 */
 	@Override
 	public Behavior getBehavior() {
 		return behavior;
