@@ -12,6 +12,8 @@ public class HumanStrategy implements Strategy, Serializable{
 	private Behavior behavior;
 	/**
 	 * Constructor for HumanStrategy
+	 * @param player
+  	 *            the desired player the user want to use
 	 */
 	public HumanStrategy(Player player) {
 		this.player = player;
