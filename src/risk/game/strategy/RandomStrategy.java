@@ -8,17 +8,26 @@ import java.util.Random;
 import risk.game.Cards;
 import risk.game.Player;
 import risk.game.Territory;
-
+/**
+ * The Random Strategy that implements strategy and serializable operation
+ */
 public class RandomStrategy implements Strategy, Serializable {
 	
 	private Player player;
 	private Behavior behavior;
-	
+	/**
+ 	 * Constructor for RandomStrategy
+ 	 * @param player
+ 	 *            the desired player the user want to use
+ 	 */
 	public RandomStrategy(Player player) {
 		this.player = player;
 		behavior = Behavior.RANDOM;
 	}
 	
+	/**
+	 * Method to startup
+	 */
 	@Override
 	public void startup() {
 		while (player.getUnassignedArmy() != 0) {
@@ -26,7 +35,9 @@ public class RandomStrategy implements Strategy, Serializable {
 			player.placeUnassignedArmy(randomTerritory, 1);
 		}
 	}
-
+	/**
+	 * Method to reinforce.
+	 */
 	@Override
 	public void reinforce() {
 		Random r = new Random();
@@ -48,7 +59,9 @@ public class RandomStrategy implements Strategy, Serializable {
 			player.placeUnassignedArmy(randomTerritory, r.nextInt(player.getUnassignedArmy()) + 1);
 		}
 	}
-
+	/**
+	 * Method to attack.
+	 */
 	@Override
 	public void attack() {
 		player.updateAttackableMap();
@@ -80,6 +93,9 @@ public class RandomStrategy implements Strategy, Serializable {
 		}
 	}
 
+	/**
+	 * Method to fortify
+	 */
 	@Override
 	public void fortify() {
 		player.updateReachableMap();
@@ -100,12 +116,20 @@ public class RandomStrategy implements Strategy, Serializable {
 		
 		player.moveArmy(randomStartTerritory, randomDestTerritory, r.nextInt(randomStartTerritory.getArmy() - 1) + 1);
 	}
-
+	/**
+  	* Method to get its behavior
+ 	 * 
+ 	 * @return the behavior in Behavior type
+ 	 */
 	@Override
 	public Behavior getBehavior() {
 		return behavior;
 	}
-	
+	/**
+	 * Method to get territory which can be attacked
+	 * 
+	 * @return the defender that got which is territory type
+	 */
 	private Territory getAttacker(Territory defender) {
 		if (defender == null) {
 			return null;
