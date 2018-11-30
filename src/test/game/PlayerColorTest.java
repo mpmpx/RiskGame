@@ -1,4 +1,4 @@
-package game;
+package test.game;
 
 import static org.junit.Assert.*;
 
@@ -11,23 +11,25 @@ import org.junit.Test;
 import risk.game.PlayerColor;
 
 public class PlayerColorTest {
-
+	
+	// Before test.
 	@BeforeClass
 	public static void beforeTest() {
-		System.out.println("Start to test PlayerColorTest.");
+		System.out.println("Start to test PlayerColor.");
 	}
 	
+	// Test nextColor method.
 	@Test
-	public void testnextColor() {
+	public void testNextColor() {
 		PlayerColor.reset();
 		assertEquals(Color.red, PlayerColor.nextColor());
 		System.out.println("Successfully test set nextColor.");
 	}
 	
-
+	// After test.
 	@AfterClass
 	public static void afterTest() {
-		System.out.println("Finish testing nextColor.");
+		System.out.println("Finish testing PlayerColor.");
 		System.out.println();
 	}
 }

@@ -1,4 +1,4 @@
-package game;
+package test.game;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -15,17 +16,24 @@ import risk.game.Territory;
 
 public class RiskMapTest {
 	
-	RiskMap map = RiskMap.getInstance();
+	RiskMap map;
 	Continent testContinent = new Continent("Asia", 5);
 	
+	// Before test.
 	@BeforeClass
 	public static void beforeTest() {
 		System.out.println("Start to test RiskMapTest.");
 	}
 	
+	// Before each test case
+	@Before
+	public void before() {
+		map = new RiskMap();
+	}
 	
+	// Test addContinent method.
 	@Test
-	public void testaddContinent() {
+	public void addContinentTest() {
 		map.clear();
 		Continent newContinent = new Continent("Afric", 5);
 		
@@ -40,8 +48,9 @@ public class RiskMapTest {
 		System.out.println("Successfully test addContinent.");
 	}
 	
+	// Test addTerritory method.
 	@Test
-	public void testaddTerritoryry() {
+	public void addTerritoryTest() {
 		String name = "Africa";
 		String nameNew = "Africa1";
 		Point location = new Point(100,100);
@@ -61,27 +70,25 @@ public class RiskMapTest {
 		System.out.println("Successfully test addTerritory.");
 	}
 	
+	// Test updateTerritory method.
 	@Test
-	public void testupdateTerritory() {
+	public void updateTerritoryTest() {
 		String name = "Africa";
-		String nameNew = "Africa1";
 		Point location = new Point(100,100);
 		Point locationNew= new Point(200,200);
 		Territory newTerritory = new Territory(name,location);
-		Territory newTerritoryNew= new Territory(nameNew,locationNew);
+		Territory newTerritoryNew= new Territory(name,locationNew);
 		
 		map.addTerritory(newTerritory);
-		
 		map.updateTerritory(newTerritoryNew);
-		
-		boolean bstate2 = map.getTerritoryMap().containsKey("Africa1");
 	
-		assertEquals(true, bstate2);
+		assertEquals(locationNew, map.getTerritoryMap().get(name).getLocation());
 		System.out.println("Successfully test updateTerritory.");
 	}
 	
+	// Test addLink method.
 	@Test
-	public void testaddLink() {
+	public void addLinkTest() {
 		String name = "Africa";
 		String nameNew = "Africa1";
 		Point location = new Point(100,100);
@@ -98,8 +105,8 @@ public class RiskMapTest {
 		
 		System.out.println("Successfully test addLink.");
 	}
-
 	
+	// After test
 	@AfterClass
 	public static void afterTest() {
 		System.out.println("Finish testing RiskMapTest.");

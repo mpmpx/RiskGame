@@ -20,7 +20,7 @@ Morocco,127,46,Northern Africa,Western Sahara,Algeria
 Algeria,193,85,Northern Africa,Morocco,Western Sahara,Mauritania,Mali,Niger,Libya,Tunisia
 Tunisia,252,33,Northern Africa,Algeria,Libya
 Libya,314,94,Northern Africa,North Sudan,Tunisia,Algeria,Niger,Chad,Egypt
-Egypt,415,99,Northern Africa,North Sudan
+Egypt,415,99,Northern Africa,Libya,North Sudan
 
 Western Sahara,62,103,Western Africa,Morocco,Algeria,Mauritania
 Mauritania,84,147,Western Africa,Western Sahara,Algeria,Mali,Senegal
@@ -61,7 +61,7 @@ Namibia,315,534,Southern Africa,Angola,Botswana,South Africa
 Botswana,373,529,Southern Africa,Angola,Zambia,Zimbabwe,South Africa,Namibia
 Zimbabwe,425,506,Southern Africa,Zambia,Mozambique,South Africa,Botswana
 Mozambique,482,496,Southern Africa,Tanzania,Malawi,Madagascar,Zambia,Zimbabwe,South Africa
-Madagascar,567,512,Southern Africa,Mozambique
+Madagascar,567,512,Northern Africa,Mozambique
 South Africa,385,596,Southern Africa,Namibia,Botswana,Zimbabwe,Mozambique
 
 

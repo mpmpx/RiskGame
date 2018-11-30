@@ -1,4 +1,4 @@
-package game;
+package test.game;
 
 import static org.junit.Assert.*;
 
@@ -14,17 +14,20 @@ import org.junit.Test;
 public class TerritoryTest {
 	Territory newTerritory = new Territory();
 
+	// Printing method.
 	public static void printMsg(String msg) {
 		System.out.println(msg);
 	}
 	
+	// Before test.
 	@BeforeClass
 	public static void beforeTest() {
 		System.out.println("Start to test Territory.");
 	}
 	
+	// Test setName method.
 	@Test
-	public void testsetName() {	
+	public void setNameTest() {	
 		String name = "lolo";
 		newTerritory.setName(name);
 
@@ -32,8 +35,9 @@ public class TerritoryTest {
 		System.out.println("Successfully testsetName."); 
 	}
 	
+	// Test setArmy method.
 	@Test
-	public void testsetArmy() {	
+	public void setArmyTest() {	
 		int Army = 5;
 		newTerritory.setArmy(Army);
 
@@ -41,8 +45,9 @@ public class TerritoryTest {
 		System.out.println("Successfully testsetArmy."); 
 	}
 	
+	// Test addArmy method.
 	@Test
-	public void testaddArmy() {	
+	public void addArmyTest() {	
 		int Army = 5;
 		newTerritory.setArmy(Army);
 		newTerritory.addArmy(Army);
@@ -51,8 +56,9 @@ public class TerritoryTest {
 		System.out.println("Successfully addArmy."); 
 	}
 	
+	// Test setLocation method.
 	@Test
-	public void testsetLocation() {	
+	public void setLocationTest() {	
 		Point newPoint = new Point(100,200); 
 		newTerritory.setLocation(newPoint);
 		
@@ -61,8 +67,9 @@ public class TerritoryTest {
 		System.out.println("Successfully setLocation."); 
 	}
 	
+	// Test getLocation method.
 	@Test
-	public void testgetLocation() {	
+	public void getLocationTest() {	
 		Point newPoint = new Point(100,200); 
 		newTerritory.setLocation(newPoint);
 	
@@ -70,8 +77,9 @@ public class TerritoryTest {
 		System.out.println("Successfully getLocation."); 
 	}
 	
+	// Test revomeArmy method.
 	@Test
-	public void testrevomeArmy() {	
+	public void revomeArmyTest() {	
 		newTerritory.setArmy(10);
 		assertEquals(10, newTerritory.getArmy());
 		
@@ -81,8 +89,9 @@ public class TerritoryTest {
 		System.out.println("Successfully revomeArmy."); 
 	}
 	
+	// Test setShape method.
 	@Test
-	public void testsetShape() {	
+	public void setShapeTest() {	
 		LinkedList<Point> shape = new LinkedList<Point> ();
 		Point newPoint1 = new Point(100,201); 
 		Point newPoint2 = new Point(100,202); 
@@ -104,6 +113,7 @@ public class TerritoryTest {
 		System.out.println("Successfully setShape."); 
 	}
 	
+	// After test
 	@AfterClass
 	public static void afterTest() {
 		printMsg("Finish testing Territory.");

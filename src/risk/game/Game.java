@@ -419,6 +419,7 @@ public class Game extends Observable implements Serializable{
 	 */
 	public void attack(int attackerDiceNum, int defenderDiceNum) {
 		Player defendingPlayer= defender.getOwner();
+		currentPlayer = attacker.getOwner();
 		
 		currentPlayer.attack(attacker, defender, attackerDiceNum, defenderDiceNum);
 		attackerDice = currentPlayer.getDice();
