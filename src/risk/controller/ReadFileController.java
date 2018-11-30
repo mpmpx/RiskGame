@@ -130,7 +130,7 @@ public class ReadFileController {
         	    	
         	for (Boolean status : visited.values()) {
         		if (status == false) {
-    				throw new Exception(continentName + " is not a connected subgraph");
+    				throw new Exception(continentName + " is not a connected subgraph.");
         		}
         	}
     	}
@@ -151,12 +151,7 @@ public class ReadFileController {
     			throw new Exception(territory.getName() + " has more than 10 adjacent countries.");
     		}
     		for (String adjacent : edgeMap.get(territory.getName())) {
-    			if (territoryMap.containsKey(adjacent) && edgeMap.containsKey(adjacent)) {
-    				if (!edgeMap.get(adjacent).contains(territory.getName())) {
-    					throw new Exception(territory.getName() + " and " + adjacent + " do not link to each other.");
-    				}
-    			}
-    			else {
+    			if (!territoryMap.containsKey(adjacent) || !edgeMap.containsKey(adjacent)) {
     				throw new Exception("Adjacent territory of " + territory.getName() + ": " + adjacent + " is invalid.");
     			}
     		}
@@ -315,13 +310,6 @@ public class ReadFileController {
         });
         bufferedReader.close();
         
-        for (String territory : edgeMap.keySet()) {
-        	Territory currentTerritory = territoryMap.get(territory);
-        	for (String adjacent : edgeMap.get(territory)) {
-        		currentTerritory.addAdjacent(territoryMap.get(adjacent));
-        	}
-        }
-        
         // Map validation.
         validateBlockName();
         validateContinent();
@@ -329,6 +317,13 @@ public class ReadFileController {
         validateConnectedGraph();
     	validateConnectedContinent();
         
+        for (String territory : edgeMap.keySet()) {
+        	Territory currentTerritory = territoryMap.get(territory);
+        	for (String adjacent : edgeMap.get(territory)) {
+        		currentTerritory.addAdjacent(territoryMap.get(adjacent));
+        	}
+        }
+    	
         for (Territory territory : territoryMap.values()) {
         	continentMap.get(territory.getContinentName()).addTerritory(territory);
         	map.addTerritory(territory);

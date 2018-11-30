@@ -1,4 +1,4 @@
-package game;
+package test.game;
 
 import static org.junit.Assert.*;
 import org.junit.AfterClass;
@@ -15,12 +15,14 @@ public class CardsTest {
 		System.out.println(msg);
 	}
 	
+	// Before test.
 	@BeforeClass
 	public static void beforeTest() {
 		printMsg("Start to test.");
 		System.out.println("Start to test Cards.");
 	}
 	
+	// Before each test case
 	@Test
 	public void testgetSizeTest() {	
 		newCards.addCard(2);
@@ -32,6 +34,7 @@ public class CardsTest {
 		System.out.println("Successfully get the cards size " + newValue + "."); 
 	}
 	
+	// Test removing some cards from a player's hand card.
 	@Test
 	public void testremoveCards() {	
 		newCards.getCard();   
@@ -40,7 +43,7 @@ public class CardsTest {
 		System.out.println("Successfully removeCards. " ); 
 	}
 	
-	
+	// After test
 	@AfterClass
 	public static void afterTest() {
 		printMsg("Finish testing cards.");

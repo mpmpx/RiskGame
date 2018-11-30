@@ -17,7 +17,7 @@ public class AggressiveStrategy implements Strategy , Serializable{
 	private Behavior behavior;
 	/**
 	 * Constructor of AggressiveStratege
-	 * @param Player 
+	 * @param player 
 	 *		the player to use strategy
 	 */
 	public AggressiveStrategy(Player player) {

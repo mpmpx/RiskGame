@@ -1,4 +1,4 @@
-package game;
+package test.game;
 
 import static org.junit.Assert.*;
 
@@ -16,33 +16,37 @@ public class ContinentTest {
 	String newName = "Africa";
 	int newValue = 6;
 	Continent continent = new Continent(newName, newValue);
-
+	
+	// Before test.
 	@BeforeClass
 	public static void beforeTest() {
 		System.out.println("Start to test Continent.");
 	}
 	
+	// Before each test case
 	@Test
 	public void testSetName() {
 		assertEquals(newName, continent.getName());
 		System.out.println("Successfully set the name of continent with " + newName + ".");
 	}
 	
+	// Test adding a territory to a continent.
 	@Test
-	public void testaddTerritory() {
+	public void addTerritoryTest() {
 		String name = "Africa";
 		String nameNew = "Africa1";
 		Point location = new Point(100,100);
 		Territory newTerritory = new Territory(name,location);
 		
 		continent.addTerritory(newTerritory);
-		assertEquals(true, continent.getTerritoryMap().contains(name) );
-		assertEquals(false, continent.getTerritoryMap().contains(nameNew) );
+		assertEquals(true, continent.getTerritoryList().contains(name) );
+		assertEquals(false, continent.getTerritoryList().contains(nameNew) );
 		System.out.println("Successfully add Territory! " );
 	}
 	
+	// Test removing a territory from a continent.
 	@Test
-	public void testremoveTerritory() {
+	public void removeTerritoryTest() {
 		String name = "Africa";
 		String nameNew = "Africa1";
 		Point location = new Point(100,100);
@@ -52,19 +56,20 @@ public class ContinentTest {
 		
 		continent.addTerritory(newTerritory);
 		continent.addTerritory(newTerritoryNew);
-		assertEquals(true, continent.getTerritoryMap().contains(name) );
-		assertEquals(true, continent.getTerritoryMap().contains(nameNew) );
+		assertEquals(true, continent.getTerritoryList().contains(name) );
+		assertEquals(true, continent.getTerritoryList().contains(nameNew) );
 		
 		continent.removeTerritory(newTerritory);
-		assertEquals(false, continent.getTerritoryMap().contains(name) );
-		assertEquals(true, continent.getTerritoryMap().contains(nameNew) );
+		assertEquals(false, continent.getTerritoryList().contains(name) );
+		assertEquals(true, continent.getTerritoryList().contains(nameNew) );
 		
 		System.out.println("Successfully remove Territory! " );
 	}
 	
-	
+	// Test whether a continent's all belonging territories 
+	// are in a given list of territories. 
 	@Test
-	public void testisOwned() {
+	public void isOwnedTest() {
 		String name = "Africa";
 		String nameNew = "Africa1";
 		Point location = new Point(100,100);
@@ -84,6 +89,7 @@ public class ContinentTest {
 		System.out.println("Successfully isOwned! " );
 	}
 	
+	// After test
 	@AfterClass
 	public static void afterTest() {
 		System.out.println("Finish testing Continent.");

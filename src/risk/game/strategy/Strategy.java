@@ -12,7 +12,8 @@ public interface Strategy {
 	};
 	
 	/**
-  	* Method to get its behavior
+  	* Method to get its behavior.
+  	* @return the behavior.
   	*/ 	
 	Behavior getBehavior();
 	void startup();
